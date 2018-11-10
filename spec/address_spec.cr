@@ -39,4 +39,19 @@ describe Fremkit::Address do
             addr = TestAddress.new(TestAddressBytes + [0_u8], true)
         end
     end
+
+    it "should be able to decode a string and return a little-endian array of bytes" do
+        addr = TestAddress.new("0xdeadbeef00000000")
+        TestAddressBytes.should eq(addr.bytes)
+    end
+
+    it "should be able to decode a string and return a big-endian array of bytes" do
+        addr = TestAddress.new("0xdeadbeef00000000", true)
+        TestAddressBytes.reverse.should eq(addr.bytes)
+    end
+
+    it "should be able to decode a string and get it back" do
+        "0xdeadbeef00000000".should eq(TestAddress.new("0xdeadbeef00000000").to_s)
+        "0xdeadbeef00000000".should eq(TestAddress.new("0xdeadbeef00000000", true).to_s)
+    end
 end
