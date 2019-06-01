@@ -16,7 +16,7 @@ jobs: # a collection of jobs
             - ./lib
       - run:
           name: Install cmake
-          command: apt update && apt search cmake && apt-get install -y cmake
+          command: sed -i -- 's/VERSION 3.13/VERSION 3.5/g' CMakeLists.txt && apt update && apt search cmake && apt-get install -y cmake
       - run:
           name: Update submodules
           command: git submodule update --init
