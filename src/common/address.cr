@@ -26,7 +26,7 @@
 require "big"
 
 module Fremkit
-    class InvalidFormatException < Exception
+    class InvalidAddressFormatException < Exception
         def initialize(format : String, addr : Address)
             super("Invalid address format, got: #{addr.hex_str}, expected: #{format}")
         end
@@ -53,12 +53,14 @@ module Fremkit
         # `little` is true if bytes should be stored in little-endian
         # order
         def initialize(str : String, @little : Bool = false)
-            @to_i = str.to_i(16, prefix: true)
+            # Remove the header, not supported by BigInt.new
+            str = str[2..] if str[0] == '0' && (str[1] == 'x' || str[1] == 'X')
 
-            @bytes = Array(UInt8).new
+            @to_i = BigInt.new(str, 16)
+            @bytes = Array(UInt8).new(str.size / 2, 0u8)
 
             @bytes.size.times do |i|
-                @bytes[@little ? i : (@bytes.size - 1 - i)] = @to_i & (0xff << (8*i))
+                @bytes[@little ? i : (@bytes.size - 1 - i)] = (@to_i >> (8*i)).to_u8
             end
         end
 
@@ -69,6 +71,11 @@ module Fremkit
         # This should be overloaded to allocate the right size
         # of bytes into @bytes
         abstract def format_size : Int32
+
+        # Default address format descriptor, overload if needed.
+        def format_str : String
+            "#{self.format_size} bytes"
+        end
 
         def to_s
             hex_str()
@@ -84,7 +91,7 @@ module Fremkit
                     @to_i = (@to_i << 8) + b
                 end
             else
-                raise "Invalid address format"
+                raise InvalidAddressFormatException.new(format_str, self)
             end
         end
 

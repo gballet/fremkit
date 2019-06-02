@@ -71,7 +71,7 @@ describe Fremkit::Address do
     end
 
     it "should be able to decode a string and return a big-endian array of bytes" do
-        addr = TestAddress.new("0xdeadbeef00000000", true)
+        addr = TestAddress.new("deadbeef00000000", true)
         TestAddressBytes.reverse.should eq(addr.bytes)
     end
 
