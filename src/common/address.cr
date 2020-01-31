@@ -26,81 +26,81 @@
 require "big"
 
 module Fremkit
-    class InvalidAddressFormatException < Exception
-        def initialize(format : String, addr : Address)
-            super("Invalid address format, got: #{addr.hex_str}, expected: #{format}")
-        end
+  class InvalidAddressFormatException < Exception
+    def initialize(format : String, addr : Address)
+      super("Invalid address format, got: #{addr.hex_str}, expected: #{format}")
+    end
+  end
+
+  # This represents an address and contains general helper methods.
+  # To obtain a workable object, `check_format` needs to be over-
+  # loaded to check that the address' format is correct.
+  abstract struct Address
+    getter :bytes
+    getter :to_i
+    getter :little
+
+    @str : String = ""
+
+    # Turns the list of bytes into an address. `little` specifies
+    # the endianness of those bytes.
+    def initialize(@bytes : Array(UInt8), @little : Bool = false)
+      @to_i = BigInt.new(0)
+      from_bytes(@bytes)
     end
 
-    # This represents an address and contains general helper methods.
-    # To obtain a workable object, `check_format` needs to be over-
-    # loaded to check that the address' format is correct.
-    abstract struct Address
-        getter :bytes
-        getter :to_i
-        getter :little
+    # Turns a hex string representing an address into an address.
+    # `little` is true if bytes should be stored in little-endian
+    # order
+    def initialize(str : String, @little : Bool = false)
+      # Remove the header, not supported by BigInt.new
+      str = str[2..] if str[0] == '0' && (str[1] == 'x' || str[1] == 'X')
 
-        @str : String = ""
+      @to_i = BigInt.new(str, 16)
+      @bytes = Array(UInt8).new(str.size.as(Int) >> 1, 0u8)
 
-        # Turns the list of bytes into an address. `little` specifies
-        # the endianness of those bytes.
-        def initialize(@bytes : Array(UInt8), @little : Bool = false)
-            @to_i = BigInt.new(0)
-            from_bytes(@bytes)
-        end
-
-        # Turns a hex string representing an address into an address.
-        # `little` is true if bytes should be stored in little-endian
-        # order
-        def initialize(str : String, @little : Bool = false)
-            # Remove the header, not supported by BigInt.new
-            str = str[2..] if str[0] == '0' && (str[1] == 'x' || str[1] == 'X')
-
-            @to_i = BigInt.new(str, 16)
-            @bytes = Array(UInt8).new(str.size / 2, 0u8)
-
-            @bytes.size.times do |i|
-                @bytes[@little ? i : (@bytes.size - 1 - i)] = (@to_i >> (8*i)).to_u8
-            end
-        end
-
-        # This should be overloaded to check that the size of
-        # the `@bytes` array corresponds to a valid address.
-        abstract def check_format : Bool
-
-        # This should be overloaded to allocate the right size
-        # of bytes into @bytes
-        abstract def format_size : Int32
-
-        # Default address format descriptor, overload if needed.
-        def format_str : String
-            "#{self.format_size} bytes"
-        end
-
-        def to_s
-            hex_str()
-        end
-
-        def from_bytes(bytes : Array(UInt8))
-            @bytes = bytes
-
-            if check_format()
-                # Calculates the integral version
-                @to_i = BigInt.new(0)
-                (@little ? @bytes.reverse : @bytes).each do |b|
-                    @to_i = (@to_i << 8) + b
-                end
-            else
-                raise InvalidAddressFormatException.new(format_str, self)
-            end
-        end
-
-        def hex_str : String
-            # Cache the string version, and display the length
-            # of the address based on the size of the @bytes
-            # array.
-            @str = sprintf "0x%0#{@bytes.size*2}x", @to_i if @str == ""
-            @str
-        end
+      @bytes.size.times do |i|
+        @bytes[@little ? i : (@bytes.size - 1 - i)] = ((@to_i >> (8*i)) & 0xFF).to_u8
+      end
     end
+
+    # This should be overloaded to check that the size of
+    # the `@bytes` array corresponds to a valid address.
+    abstract def check_format : Bool
+
+    # This should be overloaded to allocate the right size
+    # of bytes into @bytes
+    abstract def format_size : Int32
+
+    # Default address format descriptor, overload if needed.
+    def format_str : String
+      "#{self.format_size} bytes"
+    end
+
+    def to_s
+      hex_str()
+    end
+
+    def from_bytes(bytes : Array(UInt8))
+      @bytes = bytes
+
+      if check_format()
+        # Calculates the integral version
+        @to_i = BigInt.new(0)
+        (@little ? @bytes.reverse : @bytes).each do |b|
+          @to_i = (@to_i << 8) + b
+        end
+      else
+        raise InvalidAddressFormatException.new(format_str, self)
+      end
+    end
+
+    def hex_str : String
+      # Cache the string version, and display the length
+      # of the address based on the size of the @bytes
+      # array.
+      @str = sprintf "0x%0#{@bytes.size*2}x", @to_i if @str == ""
+      @str
+    end
+  end
 end

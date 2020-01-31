@@ -25,6 +25,9 @@
 
 require "./common/address"
 require "./utils/rlp"
+require "./core/block"
+require "./core/state"
+require "./core/tx"
 
 module Fremkit
   VERSION = "0.1.0"
