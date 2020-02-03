@@ -7,7 +7,9 @@ authors:
 targets:
   fremkit:
     main: src/fremkit.cr
+  evm:
+    main: src/evm.cr
 
-crystal: 0.27.0
+crystal: 0.32.1
 
 license: MIT
