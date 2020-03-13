@@ -23,13 +23,12 @@
 #
 # For more information, please refer to <http://unlicense.org>
 
-require "./common/address"
-require "./utils/rlp"
-require "./core/block"
-require "./core/state"
-require "./core/tx"
-require "./core/transition"
+require "big"
 
-module Fremkit
-  VERSION = "0.1.0"
+module Fremkit::Core
+    abstract class Tx
+        abstract def from() : Address
+        abstract def to() : Address
+        abstract def value() : BigInt
+    end
 end

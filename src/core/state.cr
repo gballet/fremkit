@@ -23,13 +23,15 @@
 #
 # For more information, please refer to <http://unlicense.org>
 
-require "./common/address"
-require "./utils/rlp"
-require "./core/block"
-require "./core/state"
-require "./core/tx"
-require "./core/transition"
+module Fremkit::Core
+  include Fremkit
 
-module Fremkit
-  VERSION = "0.1.0"
+  # Abstract class to represent the state of a contract
+  abstract class State
+    abstract def get_word(address : Address) : Bytes
+    abstract def get(address : Address, size : Uint32) : Bytes
+
+    abstract def set_word(address : Address, bytes : Bytes)
+    abstract def set(address : Address, bytes : Bytes)
+  end
 end

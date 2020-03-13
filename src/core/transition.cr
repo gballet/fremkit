@@ -23,13 +23,10 @@
 #
 # For more information, please refer to <http://unlicense.org>
 
-require "./common/address"
-require "./utils/rlp"
-require "./core/block"
-require "./core/state"
-require "./core/tx"
-require "./core/transition"
+module Fremkit::Core
+  include Fremkit
 
-module Fremkit
-  VERSION = "0.1.0"
+  abstract class TransitionFunction
+    abstract def transition(pre_state : State, tx : Tx) : State
+  end
 end
