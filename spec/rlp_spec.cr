@@ -27,7 +27,7 @@ require "./spec_helper.cr"
 
 include Fremkit::Utils::RLP
 
-describe "prout" do
+describe "RLP tests" do
   it "should encode 1 as 1 byte" do
     x = encode(Bytes[1u8])
     x.size.should eq(1)
