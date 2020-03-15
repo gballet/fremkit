@@ -51,30 +51,35 @@ describe "RLP tests" do
 
   it "should be able to decode a byte that it has encoded" do
     i = Bytes[23u8]
-    r = decode(encode(i))
+    r, size = decode(encode(i))
     r.should eq(i)
+    size.should eq 1
 
     i = Bytes[157u8]
-    r = decode(encode(i))
+    r, size = decode(encode(i))
     r.should eq(i)
+    size.should eq 2
   end
 
   it "should be able to decode a byte array that it has encoded" do
     i = Bytes[23u8, 35u8, 12u8]
-    r = decode(encode(i))
+    r, size = decode(encode(i))
     r.should eq(i)
+    size.should eq 4
   end
 
   it "should be able to decode a long byte array that it has encoded" do
     i = Random.new.random_bytes(59)
-    r = decode(encode(i))
+    r, size = decode(encode(i))
     r.should eq(i)
+    size.should eq 61
   end
 
   it "should be able to encode and decode a byte array whose length is more than 1 byte wide" do
     i = Random.new.random_bytes(1024)
-    r = decode(encode(i))
+    r, size = decode(encode(i))
     r.should eq(i)
+    size.should eq 1027
   end
 
   it "should be able to encode a complex structure smaller than 56 bytes" do

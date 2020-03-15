@@ -99,16 +99,18 @@ module Fremkit::Utils::RLP
   end
 
   def decode(bytes : Bytes) : Bytes
+  # Specialization for when this is a list of bytes
+  def decode(bytes : Bytes) : {Bytes, UInt32}
     case bytes[0]
     when 0..127
       raise DecodeException.new if bytes.size != 1
-      bytes
+      {bytes, 1.to_u32}
     when 128..182
       length = bytes[0] - 128
       raise DecodeException.new if length >= 56 || (bytes.size - length != 1)
       ret = IO::Memory.new(length)
       ret.write(bytes[1..])
-      ret.to_slice
+      {ret.to_slice, length.to_u32 + 1}
     else
       length_length = bytes[0] - 183
       raise DecodeException.new if (bytes.size - length_length <= 1)
@@ -118,7 +120,7 @@ module Fremkit::Utils::RLP
       raise DecodeException.new if (bytes.size - length_length - 1 - length) < 0
       buffer = Bytes.new(length, 0)
       bytes[1 + length_length..].copy_to(buffer)
-      buffer
+      {buffer, length_length.to_u32 + length.to_u32 + 1}
     end
   end
 end
