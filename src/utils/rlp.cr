@@ -89,7 +89,9 @@ module Fremkit::Utils::RLP
     # of 32 so including the header and the encoding, assume it is going
     # to be 3 + 33 * items.size as a rule of thumb. And then round it up
     # to a page size.
-    encoding = IO::Memory.new(2 + 33*items.size)
+    page_size = 2 + 33*items.size
+    page_size = page_size + page_size % 4096
+    encoding = IO::Memory.new(page_size)
     encoding.write_byte(0) # placeholders for the header, 64K-3 max
     encoding.write_byte(0)
     encoding.write_byte(0)
