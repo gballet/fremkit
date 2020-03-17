@@ -10,6 +10,6 @@ targets:
   evm:
     main: src/evm.cr
 
-crystal: 0.32.1
+crystal: 0.33.0
 
 license: MIT
