@@ -153,7 +153,21 @@ module Fremkit::Utils::RLP
     end
   end
 
-  def decode(bytes : Bytes) : Bytes
+  def decode(bytes : Bytes) : {Array, UInt32}
+    case bytes[0]
+    when 192..247
+      length = bytes[0] - 192
+      raise DecodeException.new if length + 1 != bytes.size
+      ret = Array(T).new
+      offset = 0
+      while offset < length
+      end
+    when 248..255
+    else
+      raise DecodeException.new
+    end
+  end
+
   # Specialization for when this is a list of bytes
   def decode(bytes : Bytes) : {Bytes, UInt32}
     case bytes[0]
