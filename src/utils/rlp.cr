@@ -60,7 +60,7 @@ class String
     else
       if byte_count < 56
         data = Bytes.new(byte_count + 1)
-        data[0] = 192u8 + byte_count
+        data[0] = 128u8 + byte_count
         data[1..].copy_from(bytes)
         data
       else
