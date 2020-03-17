@@ -43,6 +43,36 @@ struct UInt32
       data
     end
   end
+
+def write_bigendian(x : Int, to : Bytes)
+  byte_count = (Math.log(x, 2).ceil.to_i/8).ceil.to_i
+  byte_count.times do |i|
+    to[byte_count - i - 1] = ((x >> (8 * i)) & 0xFF).to_u8
+  end
+end
+
+class String
+  def to_rlp : Bytes
+    bytes = self.to_slice
+    byte_count = bytes.size
+    if byte_count == 1 && bytes[0] < 128u8
+      bytes
+    else
+      if byte_count < 56
+        data = Bytes.new(byte_count + 1)
+        data[0] = 192u8 + byte_count
+        data[1..].copy_from(bytes)
+        data
+      else
+        length_length = (Math.log(byte_count, 2).ceil.to_i/8).ceil.to_i
+        data = Bytes.new(1 + length_length + byte_count)
+        data[0] = 183u8 + length_length
+        write_bigendian(byte_count, data[1..])
+        data[1 + length_length..].copy_from(bytes)
+        data
+      end
+    end
+  end
 end
 # Helper functions for RLP
 module Fremkit::Utils::RLP
