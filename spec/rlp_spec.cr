@@ -47,6 +47,8 @@ describe "RLP tests" do
   end
 
   it "should encode a 56 byte array as 58 bytes" do
+    rlp = Array.new(56, 0u8).to_rlp
+    rlp.size.should eq 58
   end
 
   it "should be able to decode a byte that it has encoded" do

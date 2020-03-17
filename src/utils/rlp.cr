@@ -23,7 +23,7 @@
 #
 # For more information, please refer to <http://unlicense.org>
 
-struct UInt32
+struct Int
   def to_rlp : Bytes
     case self
     when 0..128
@@ -43,6 +43,8 @@ struct UInt32
       data
     end
   end
+
+end
 
 def write_bigendian(x : Int, to : Bytes)
   byte_count = (Math.log(x, 2).ceil.to_i/8).ceil.to_i
