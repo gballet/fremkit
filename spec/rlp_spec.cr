@@ -91,4 +91,15 @@ describe "RLP tests" do
     r = encode [Bytes[1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8], Bytes[2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8]]
     r.should eq Bytes[248, 58, 160, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 152, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
   end
+
+  it "should be able to encode a u32" do
+    rlp = 1u32.to_rlp
+    rlp.should eq Bytes[1u8]
+
+    rlp = 129u32.to_rlp
+    rlp.should eq Bytes[129u8, 129u8]
+
+    rlp = 0xFFFFFFFFu32.to_rlp
+    rlp.should eq Bytes[132u8, 255u8, 255u8, 255u8, 255u8]
+  end
 end

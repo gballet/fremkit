@@ -23,6 +23,27 @@
 #
 # For more information, please refer to <http://unlicense.org>
 
+struct UInt32
+  def to_rlp : Bytes
+    case self
+    when 0..128
+      Bytes[self.to_u8]
+    else
+      byte_count = (Math.log(self, 2).ceil.to_i/8).ceil.to_i
+
+      # that can't happen for UInt32
+      # if byte_count > 56
+      # raise "Number is too big to be serialized"
+      # end
+      data = Bytes.new(byte_count + 1)
+      data[0] = 128u8 + byte_count
+      0..byte_count.times do |i|
+        data[i + 1] = ((self >> (8 * (byte_count - i - 1))) & 0xFF).to_u8
+      end
+      data
+    end
+  end
+end
 # Helper functions for RLP
 module Fremkit::Utils::RLP
   class DecodeException < Exception
