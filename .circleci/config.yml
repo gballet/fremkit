@@ -14,15 +14,15 @@ jobs: # a collection of jobs
           key: dependency-cache-{{ checksum "shard.lock" }}
           paths:
             - ./lib
-      - run:
-          name: Install cmake
-          command: sed -i -- 's/VERSION 3.13/VERSION 3.5/g' CMakeLists.txt && apt update && apt search cmake && apt-get install -y cmake
-      - run:
-          name: Update submodules
-          command: git submodule update --init
-      - run:
-          name: Build evmone
-          command: mkdir -p build/evmone && cd build/evmone && cmake ../../evmone && cmake --build . -- -j
+      #- run:
+          #name: Install cmake
+          #command: sed -i -- 's/VERSION 3.13/VERSION 3.5/g' CMakeLists.txt && apt update && apt search cmake && apt-get install -y cmake
+      #- run:
+          #name: Update submodules
+          #command: git submodule update --init
+      #- run:
+          #name: Build evmone
+          #command: mkdir -p build/evmone && cd build/evmone && cmake ../../evmone && cmake --build . -- -j
       - run:
           name: test
           command: crystal spec
