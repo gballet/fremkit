@@ -122,6 +122,17 @@ describe "RLP tests" do
     pos.should eq 4
     i.should eq 0xdeadbeu32
   end
+
+  it "should be able to decode a string" do
+    s, pos = String.from_rlp(Bytes[0x83, 97, 98, 99])
+    pos.should eq 4
+    s.should eq "abc"
+
+    s, pos = String.from_rlp(Bytes[184, 57, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99, 97, 98, 99])
+    pos.should eq 59
+    s.should eq "abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc"
+  end
+
   it "should be able to encode a tuple of primitives" do
     {1, "Kull wahad"}.to_rlp.should eq Bytes[204, 1, 138, 75, 117, 108, 108, 32, 119, 97, 104, 97, 100]
   end

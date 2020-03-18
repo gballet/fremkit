@@ -113,6 +113,25 @@ class String
       end
     end
   end
+
+  def String.from_rlp(bytes : Bytes) : {String, UInt32}
+    if bytes.size == 1 && bytes[0] < 128
+      {"", 1.to_u32}
+    elsif bytes[0] < 183
+      size = bytes[0] - 128
+      raise "Invalid length" if bytes.size < size + 1
+      {String.new(bytes[1..size]), 1.to_u32 + size.to_u32}
+    else
+      length_size = bytes[0] - 183
+      length = 0u32
+      length_size.times do |i|
+        length = (length << 8) + bytes[1 + i].to_u32
+      end
+      start = 1.to_u32 + length_size.to_u32
+      stop = start + length.to_u32
+      {String.new(bytes[start...stop]), stop}
+    end
+  end
 end
 
 class Array(T)
