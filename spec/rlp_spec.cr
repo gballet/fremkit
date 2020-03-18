@@ -29,15 +29,15 @@ include Fremkit::Utils::RLP
 
 describe "RLP tests" do
   it "should encode 1 as 1 byte" do
-    x = encode(Bytes[1u8])
+    x = encode(Bytes[1])
     x.size.should eq(1)
     x[0].should eq(1)
   end
 
   it "should encode 129 as 2 bytes" do
-    x = encode(Bytes[129u8])
+    x = encode(Bytes[129])
     x.size.should eq(2)
-    x.should eq(Bytes[129u8, 129u8])
+    x.should eq(Bytes[129, 129])
   end
 
   it "should encode a 55 bytes array as 56 bytes" do
@@ -52,19 +52,19 @@ describe "RLP tests" do
   end
 
   it "should be able to decode a byte that it has encoded" do
-    i = Bytes[23u8]
+    i = Bytes[23]
     r, size = decode(encode(i))
     r.should eq(i)
     size.should eq 1
 
-    i = Bytes[157u8]
+    i = Bytes[157]
     r, size = decode(encode(i))
     r.should eq(i)
     size.should eq 2
   end
 
   it "should be able to decode a byte array that it has encoded" do
-    i = Bytes[23u8, 35u8, 12u8]
+    i = Bytes[23, 35, 12]
     r, size = decode(encode(i))
     r.should eq(i)
     size.should eq 4
@@ -85,24 +85,24 @@ describe "RLP tests" do
   end
 
   it "should be able to encode a complex structure smaller than 56 bytes" do
-    r = encode [Bytes[1u8, 1u8, 1u8], Bytes[2u8, 2u8, 2u8, 2u8]]
-    r.should eq Bytes[201u8, 131u8, 1u8, 1u8, 1u8, 132u8, 2u8, 2u8, 2u8, 2u8]
+    r = encode [Bytes[1, 1, 1], Bytes[2, 2, 2, 2]]
+    r.should eq Bytes[201, 131, 1, 1, 1, 132, 2, 2, 2, 2]
   end
 
   it "should be able to encode a complex structure bigger than 56 bytes" do
-    r = encode [Bytes[1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8], Bytes[2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8, 2u8]]
+    r = encode [Bytes[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], Bytes[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]
     r.should eq Bytes[248, 58, 160, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 152, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
   end
 
   it "should be able to encode a u32" do
     rlp = 1u32.to_rlp
-    rlp.should eq Bytes[1u8]
+    rlp.should eq Bytes[1]
 
     rlp = 129u32.to_rlp
-    rlp.should eq Bytes[129u8, 129u8]
+    rlp.should eq Bytes[129, 129]
 
     rlp = 0xFFFFFFFFu32.to_rlp
-    rlp.should eq Bytes[132u8, 255u8, 255u8, 255u8, 255u8]
+    rlp.should eq Bytes[132, 255, 255, 255, 255]
   end
 
   it "should be able to encode a string" do
