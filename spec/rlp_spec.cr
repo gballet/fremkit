@@ -113,6 +113,15 @@ describe "RLP tests" do
     rlp.should eq Bytes[184, 100, 75, 117, 108, 108, 32, 119, 97, 104, 97, 100, 75, 117, 108, 108, 32, 119, 97, 104, 97, 100, 75, 117, 108, 108, 32, 119, 97, 104, 97, 100, 75, 117, 108, 108, 32, 119, 97, 104, 97, 100, 75, 117, 108, 108, 32, 119, 97, 104, 97, 100, 75, 117, 108, 108, 32, 119, 97, 104, 97, 100, 75, 117, 108, 108, 32, 119, 97, 104, 97, 100, 75, 117, 108, 108, 32, 119, 97, 104, 97, 100, 75, 117, 108, 108, 32, 119, 97, 104, 97, 100, 75, 117, 108, 108, 32, 119, 97, 104, 97, 100]
   end
 
+  it "shoud be able to decode a u32" do
+    i, pos = UInt32.from_rlp(Bytes[42])
+    pos.should eq 1
+    i.should eq 42
+
+    i, pos = UInt32.from_rlp(Bytes[0x83, 0xde, 0xad, 0xbe])
+    pos.should eq 4
+    i.should eq 0xdeadbeu32
+  end
   it "should be able to encode a tuple of primitives" do
     {1, "Kull wahad"}.to_rlp.should eq Bytes[204, 1, 138, 75, 117, 108, 108, 32, 119, 97, 104, 97, 100]
   end

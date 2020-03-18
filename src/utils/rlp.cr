@@ -44,6 +44,19 @@ struct Int
     end
   end
 
+  def Int.from_rlp(bytes : Bytes) : {self, UInt32}
+    case bytes[0]
+    when 0..128
+      {bytes[0].to_u32, 1.to_u32}
+    else
+      byte_count = bytes[0] - 128
+      val = 0u32
+      byte_count.times do |i|
+        val = (val << 8) + bytes[1 + i].to_u32
+      end
+      {val, byte_count.to_u32 + 1}
+    end
+  end
 end
 
 def write_bigendian(x : Int, to : Bytes)
