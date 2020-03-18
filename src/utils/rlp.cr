@@ -53,6 +53,31 @@ def write_bigendian(x : Int, to : Bytes)
   end
 end
 
+def write_header(payload : Bytes, payload_size : UInt32)
+  if payload_size < 56
+    payload[2] = 192u8 + payload_size.to_u8
+    return payload[2..]
+  elsif payload_size < 256
+    payload[1] = 248
+    payload[2] = payload_size.to_u8
+    return payload[1..]
+  elsif payload_size < 65533
+    payload[0] = 249
+    write_bigendian(payload_size, payload[1..])
+    return payload
+  else
+    raise "RLP payloads bigger than 64K aren't supported"
+  end
+end
+
+def alloc_with_header : IO::Memory
+  encoding = IO::Memory.new(4096)
+  encoding.write_byte(0) # placeholders for the header, 64K-3 max
+  encoding.write_byte(0)
+  encoding.write_byte(0)
+  encoding
+end
+
 class String
   def to_rlp : Bytes
     bytes = self.to_slice
@@ -76,34 +101,16 @@ class String
     end
   end
 end
+
 class Array(T)
   def to_rlp : Bytes
-    # For the initial capacity, assume that most items will be a multiple
-    # of 32 so including the header and the encoding, assume it is going
-    # to be 3 + 33 * items.size as a rule of thumb. And then round it up
-    # to a page size.
-    page_size = {{2 + 33*@type.instance_vars.size}}
-    page_size = page_size + page_size % 4096
-    encoding = IO::Memory.new(page_size)
-    encoding.write_byte(0) # placeholders for the header, 64K-3 max
-    encoding.write_byte(0)
-    encoding.write_byte(0)
+    encoding = alloc_with_header
     self.each do |item|
       encoding.write item.to_rlp
     end
     payload_size = encoding.pos - 3
-    ret = encoding.to_slice
-    if payload_size < 56
-      ret[2] = 192u8 + payload_size.to_u8
-      return ret[2..]
-    elsif payload_size < 256
-      ret[1] = 248
-      ret[2] = payload_size.to_u8
-      return ret[1..]
-    elsif payload_size < 65533
-      ret[0] = 249
-      write_bigendian(payload_size, ret[1..])
-      return ret
+    write_header(encoding.to_slice, payload_size.to_u32)
+  end
     else
       raise "RLP payload bigger than 64K aren't supported"
     end
