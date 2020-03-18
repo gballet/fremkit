@@ -154,9 +154,6 @@ struct Tuple(*T)
     payload_size = encoding.pos - 3
     write_header(encoding.to_slice, payload_size.to_u32)
   end
-    else
-      raise "RLP payload bigger than 64K aren't supported"
-    end
   end
 end
 
