@@ -140,4 +140,8 @@ describe "RLP tests" do
   it "should be able to encode an empty tuple" do
     Tuple.new.to_rlp.should eq Bytes[0xc0]
   end
+
+  it "should be able to encode a hash table" do
+    {"Kull wahad" => "Secher Nbiw", 42 => "Rock'n'roll"}.to_rlp.should eq Bytes[228, 138, 75, 117, 108, 108, 32, 119, 97, 104, 97, 100, 139, 83, 101, 99, 104, 101, 114, 32, 78, 98, 105, 119, 42, 139, 82, 111, 99, 107, 39, 110, 39, 114, 111, 108, 108]
+  end
 end

@@ -154,6 +154,20 @@ struct Tuple(*T)
     payload_size = encoding.pos - 3
     write_header(encoding.to_slice, payload_size.to_u32)
   end
+end
+
+class Hash(K, V)
+  def to_rlp : Bytes
+    encoding = alloc_with_header
+    self.each do |k, v|
+      encoding.write k.to_rlp
+      encoding.write v.to_rlp
+    end
+    payload_size = encoding.pos - 3
+    write_header(encoding.to_slice, payload_size.to_u32)
+  end
+
+  def from_rlp(bytes : Bytes) : Typle(self, UInt32)
   end
 end
 
