@@ -66,31 +66,6 @@ def write_bigendian(x : Int, to : Bytes)
   end
 end
 
-def write_header(payload : Bytes, payload_size : UInt32)
-  if payload_size < 56
-    payload[2] = 192u8 + payload_size.to_u8
-    return payload[2..]
-  elsif payload_size < 256
-    payload[1] = 248
-    payload[2] = payload_size.to_u8
-    return payload[1..]
-  elsif payload_size < 65533
-    payload[0] = 249
-    write_bigendian(payload_size, payload[1..])
-    return payload
-  else
-    raise "RLP payloads bigger than 64K aren't supported"
-  end
-end
-
-def alloc_with_header : IO::Memory
-  encoding = IO::Memory.new(4096)
-  encoding.write_byte(0) # placeholders for the header, 64K-3 max
-  encoding.write_byte(0)
-  encoding.write_byte(0)
-  encoding
-end
-
 class String
   def to_rlp : Bytes
     bytes = self.to_slice
@@ -176,6 +151,31 @@ module Fremkit::Utils::RLP
   class DecodeException < Exception
     def initialize
       super("RLP decode error")
+    end
+  end
+
+  def alloc_with_header : IO::Memory
+    encoding = IO::Memory.new(4096)
+    encoding.write_byte(0) # placeholders for the header, 64K-3 max
+    encoding.write_byte(0)
+    encoding.write_byte(0)
+    encoding
+  end
+
+  def write_header(payload : Bytes, payload_size : UInt32)
+    if payload_size < 56
+      payload[2] = 192u8 + payload_size.to_u8
+      return payload[2..]
+    elsif payload_size < 256
+      payload[1] = 248
+      payload[2] = payload_size.to_u8
+      return payload[1..]
+    elsif payload_size < 65533
+      payload[0] = 249
+      write_bigendian(payload_size, payload[1..])
+      return payload
+    else
+      raise "RLP payloads bigger than 64K aren't supported"
     end
   end
 
