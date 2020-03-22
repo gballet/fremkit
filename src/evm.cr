@@ -51,6 +51,10 @@ while !done
     case instr
     when 0
       done = true
+    when 1
+      a = stack.pop
+      b = stack.pop
+      stack.push (a + b)
     when 0x54
       addr = stack.pop
       stack.push (state[addr] || BigInt.new)
