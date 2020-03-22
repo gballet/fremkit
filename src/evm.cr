@@ -55,6 +55,21 @@ while !done
       a = stack.pop
       b = stack.pop
       stack.push (a + b)
+    when 0x10
+      a = stack.pop
+      b = stack.pop
+      stack.push BigInt.new(a < b ? 1 : 0)
+    when 0x11
+      a = stack.pop
+      b = stack.pop
+      stack.push BigInt.new(a > b ? 1 : 0)
+    when 0x14
+      a = stack.pop
+      b = stack.pop
+      stack.push BigInt.new(a == b ? 1 : 0)
+    when 0x15
+      a = stack.pop
+      stack.push BigInt.new(a == 0 ? 1 : 0)
     when 0x54
       addr = stack.pop
       stack.push (state[addr] || BigInt.new)
