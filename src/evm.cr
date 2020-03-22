@@ -45,6 +45,10 @@ while !done
     instr = bytecode[pc]
 
     case instr
+    when 0
+      done = true
+    else
+      raise Exception.new "Unsupported instruction: #{instr}"
     end
   else
     raise Exception.new "Invalid program counter: #{pc} < #{bytecode.size} = bytecode size"
