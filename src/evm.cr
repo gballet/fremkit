@@ -23,6 +23,8 @@
 #
 # For more information, please refer to <http://unlicense.org>
 
+require "big"
+
 require "./utils/bytecode"
 
 if ARGV.size < 1
@@ -47,6 +49,21 @@ while !done
     case instr
     when 0
       done = true
+    when 0x60..0x7f
+      datasize : UInt8 = instr - 0x60
+      data = BigInt.new
+      datasize.times do |i|
+        data += bytecode[pc + i] << (1*8)
+      end
+      stack.push data
+    when 0x80..0x8f
+      depth : UInt8 = instr - 0x60
+      stack.push stack[stack.size - 1 - depth]
+    when 0x90..0x9f
+      depth : UInt8 = instr - 0x60
+      tmp = stack[stack.size - 1 - depth]
+      stack[stack.size - 1 - depth] = stack[stack.size - 1]
+      stack[stack.size - 1] = tmp
     else
       raise Exception.new "Unsupported instruction: #{instr}"
     end
