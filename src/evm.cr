@@ -49,45 +49,45 @@ while !done
     instr = bytecode[pc]
 
     case instr
-    when 0
+    when 0 # STOP
       done = true
-    when 1
+    when 1 # ADD
       a = stack.pop
       b = stack.pop
       stack.push (a + b)
-    when 0x10
+    when 0x10 # LT
       a = stack.pop
       b = stack.pop
       stack.push BigInt.new(a < b ? 1 : 0)
-    when 0x11
+    when 0x11 # GT
       a = stack.pop
       b = stack.pop
       stack.push BigInt.new(a > b ? 1 : 0)
-    when 0x14
+    when 0x14 # EQ
       a = stack.pop
       b = stack.pop
       stack.push BigInt.new(a == b ? 1 : 0)
-    when 0x15
+    when 0x15 # ISZERO
       a = stack.pop
       stack.push BigInt.new(a == 0 ? 1 : 0)
-    when 0x54
+    when 0x54 # SLOAD
       addr = stack.pop
       stack.push (state[addr] || BigInt.new)
-    when 0x55
+    when 0x55 # SSTORE
       addr = stack.pop
       word = stack.pop
       state[addr] = word
-    when 0x60..0x7f
+    when 0x60..0x7f # PUSHn
       datasize : UInt8 = instr - 0x60
       data = BigInt.new
       datasize.times do |i|
         data += bytecode[pc + i] << (1*8)
       end
       stack.push data
-    when 0x80..0x8f
+    when 0x80..0x8f # DUPn
       depth : UInt8 = instr - 0x60
       stack.push stack[stack.size - 1 - depth]
-    when 0x90..0x9f
+    when 0x90..0x9f # SWAPn
       depth : UInt8 = instr - 0x60
       tmp = stack[stack.size - 1 - depth]
       stack[stack.size - 1 - depth] = stack[stack.size - 1]
