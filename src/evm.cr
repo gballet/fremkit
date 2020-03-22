@@ -42,6 +42,8 @@ done = false
 pc : UInt16 = 0
 stack = Array(BigInt).new
 
+state = Hash(BigInt, BigInt).new
+
 while !done
   if pc < bytecode.size
     instr = bytecode[pc]
@@ -49,6 +51,13 @@ while !done
     case instr
     when 0
       done = true
+    when 0x54
+      addr = stack.pop
+      stack.push (state[addr] || BigInt.new)
+    when 0x55
+      addr = stack.pop
+      word = stack.pop
+      state[addr] = word
     when 0x60..0x7f
       datasize : UInt8 = instr - 0x60
       data = BigInt.new
