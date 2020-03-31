@@ -121,4 +121,6 @@ while !done
   else
     raise Exception.new "Invalid program counter: #{pc} < #{bytecode.size} = bytecode size"
   end
+
+  pc += 1
 end
