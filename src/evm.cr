@@ -95,6 +95,11 @@ while !done
       addr = stack.pop
       word = stack.pop
       state[addr] = word
+    when 0x56 # JUMP
+      addr = stack.pop
+      pc = addr.to_u16 - 1
+    when 0x58 # PC
+      stack.push BigInt.new(pc)
     when 0x60..0x7f # PUSHn
       datasize : UInt8 = instr - 0x60
       data = BigInt.new
