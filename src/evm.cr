@@ -74,6 +74,18 @@ while !done
     when 0x15 # ISZERO
       a = stack.pop
       stack.push BigInt.new(a == 0 ? 1 : 0)
+    when 0x16 # AND
+      a = stack.pop
+      b = stack.pop
+      stack.push (a & b)
+    when 0x17 # OR
+      a = stack.pop
+      b = stack.pop
+      stack.push (a | b)
+    when 0x18 # XOR
+      a = stack.pop
+      b = stack.pop
+      stack.push (a ^ b)
     when 0x54 # SLOAD
       addr = stack.pop
       stack.push (state[addr] || BigInt.new)
