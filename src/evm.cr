@@ -86,6 +86,8 @@ while !done
       a = stack.pop
       b = stack.pop
       stack.push (a ^ b)
+    when 0x50 # POP
+      stack.pop
     when 0x54 # SLOAD
       addr = stack.pop
       stack.push (state[addr] || BigInt.new)
