@@ -44,6 +44,8 @@ stack = Array(BigInt).new
 
 state = Hash(BigInt, BigInt).new
 
+mem = Array(BigInt).new(4_000)
+
 while !done
   if pc < bytecode.size
     instr = bytecode[pc]
@@ -100,6 +102,8 @@ while !done
       pc = addr.to_u16 - 1
     when 0x58 # PC
       stack.push BigInt.new(pc)
+    when 0x59 # MSIZE
+      stack.push BigInt.new(mem.size)
     when 0x60..0x7f # PUSHn
       datasize : UInt8 = instr - 0x60
       data = BigInt.new
