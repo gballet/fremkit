@@ -110,6 +110,10 @@ while !done
       stack.push BigInt.new(pc)
     when 0x59 # MSIZE
       stack.push BigInt.new(mem.size)
+    when 0x5a # GAS
+      stack.push BigInt.new context.gas
+    when 0x5b # JUMPDEST
+      # Does nothing
     when 0x60..0x7f # PUSHn
       datasize : UInt8 = instr - 0x60
       data = BigInt.new
