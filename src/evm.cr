@@ -46,6 +46,12 @@ state = Hash(BigInt, BigInt).new
 
 mem = Array(BigInt).new(4_000)
 
+class ExecutionContext
+  getter gas : UInt64 = 0
+end
+
+context = ExecutionContext.new
+
 while !done
   if pc < bytecode.size
     instr = bytecode[pc]
