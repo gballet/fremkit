@@ -124,6 +124,37 @@ while !done
       stack.push context.state[context.address]
     when 0x32 # ORIGIN
       stack.push context.origin
+    when 0x33 # CALLER
+      stack.push context.caller
+    when 0x34 # CALLVALUE
+      stack.push context.callvalue
+    when 0x35 # CALLDATALOAD
+      off = stack.pop
+      result = BigInt.new(0)
+      32.times do |i|
+        x = if off + i >= context.calldata.size
+              0
+            else
+              context.calldata[off + i]
+            end
+        result = (result << 8) | x
+      end
+      stack.push result
+    when 0x36 # CALLDATASIZE
+      stack.push BigInt.new context.calldata.size
+    when 0x37 # CALLDATACOPY
+      addr = stack.pop
+      input_off = stack.pop
+      len = stack.pop
+      len.times do |i|
+        if context.calldata.size > input_off + i
+          mem[addr + i] = context.calldata[input_off + i]
+          # TODO check memory extension
+        else
+          # Terminate if trying to read beyond the input data size
+          done = true
+        end
+      end
     when 0x50 # POP
       stack.pop
     when 0x54 # SLOAD
