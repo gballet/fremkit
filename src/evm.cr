@@ -94,6 +94,16 @@ while !done
       a = stack.pop
       b = stack.pop
       stack.push (a ^ b)
+    when 0x19 # NOT
+      n = stack.pop
+      o = BigInt.new(0)
+      256.times do |bit|
+        o |= (1 << bit) if n.bit(bit) == 0
+      end
+    when 0x1a # BYTE
+      byte_num = stack.pop
+      src = stack.pop
+      stack.push ((src >> (8*byte_num)) & 0xFF)
     when 0x50 # POP
       stack.pop
     when 0x54 # SLOAD
