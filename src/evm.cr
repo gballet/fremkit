@@ -155,6 +155,21 @@ while !done
           done = true
         end
       end
+    when 0x38 # CODESIZE
+      stack.push BigInt.new context.code.size
+    when 0x39 # CODECOPY
+      addr = stack.pop
+      code_off = stack.pop
+      len = stack.pop
+      len.times do |i|
+        if context.calldata.size > code_off + i
+          mem[addr + i] = context.calldata[code_off + i]
+          # TODO check memory extension
+        else
+          # Terminate if trying to read beyond the input data size
+          done = true
+        end
+      end
     when 0x50 # POP
       stack.pop
     when 0x54 # SLOAD
