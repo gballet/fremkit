@@ -170,6 +170,8 @@ while !done
           done = true
         end
       end
+    when 0x3a # GASPRICE
+      stack.push context.gasprice
     when 0x50 # POP
       stack.pop
     when 0x54 # SLOAD
