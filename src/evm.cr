@@ -47,10 +47,24 @@ state = Hash(BigInt, BigInt).new
 mem = Array(BigInt).new(4_000)
 
 class ExecutionContext
-  getter gas : UInt64 = 0
+  property gas : UInt64 = 0
+  getter address : BigInt = BigInt.new(0)
+  property state : Hash(BigInt, BigInt) = Hash(BigInt, BigInt).new
+  getter origin : BigInt = BigInt.new(0)
+  getter caller : BigInt = BigInt.new(0)
+  getter callvaluer : BigInt = BigInt.new(0)
+  property calldata : Bytes = Bytes.empty
+  getter code : Bytes = Bytes.empty
+  getter gasprice : UInt64 = 0
+  property retdata : Bytes = Bytes.empty
 end
 
 context = ExecutionContext.new
+
+# TODO idee de malade: jetter du Int dans la pile, comme ca je peux
+# melanger le bigint et le int et voir si ca depote un max question
+# execution, sans avoir a me prendre la tete pour voir si un truc
+# est ceci ou cela.
 
 while !done
   if pc < bytecode.size
@@ -104,6 +118,12 @@ while !done
       byte_num = stack.pop
       src = stack.pop
       stack.push ((src >> (8*byte_num)) & 0xFF)
+    when 0x30 # ADDRESS
+      stack.push context.address
+    when 0x31 # BALANCE
+      stack.push context.state[context.address]
+    when 0x32 # ORIGIN
+      stack.push context.origin
     when 0x50 # POP
       stack.pop
     when 0x54 # SLOAD
