@@ -27,9 +27,19 @@ module Fremkit::Core
   include Fremkit
 
   # Abstract class to represent the state of a contract
-  abstract class State
-    abstract def get_word(address : Address) : Bytes
-    abstract def get(address : Address, size : Uint32) : Bytes
+  abstract class State(A, T)
+    abstract def get_word(address : A) : T
+
+    def [](address : A) : T
+      get_word address
+    end
+
+    abstract def set_word(address : A, value : T)
+
+    def []=(address : A, value : T) : T
+      set_word address, value
+    end
+  end
 
     abstract def set_word(address : Address, bytes : Bytes)
     abstract def set(address : Address, bytes : Bytes)
