@@ -103,4 +103,22 @@ module Fremkit
       @str
     end
   end
+
+  module Eth
+    struct AccountAddress < Address
+      @[AlwaysInline]
+      def format_size : UInt32
+        40
+      end
+
+      @[AlwaysInline]
+      def check_format : Bool
+        return false if @bytes.size != 40
+        @bytes.each do |b|
+          return false if b > 15
+        end
+        true
+      end
+    end
+  end
 end
