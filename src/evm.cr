@@ -34,19 +34,15 @@ if ARGV.size < 1
 end
 
 b = BigInt.new(ARGV[1], 16)
-bytecode = Array(UInt8).new(ARGV[-1].size.as(Int) >> 1, 0u8)
+bytecode = Bytes.new(ARGV[-1].size.as(Int) >> 1, 0u8)
 bytecode.size.times do |i|
   bytecode[bytecode.size - 1 - i] = ((b >> (8*i)) & 0xFF).to_u8
 end
 
 done = false
 pc : UInt16 = 0
-stack = Array(BigInt).new
-
 state = Hash(BigInt, BigInt).new
-
-mem = Array(BigInt).new(4_000)
-
+mem = Bytes.new(4_000)
 context = ExecutionContext.new
 
 # TODO idee de malade: jetter du Int dans la pile, comme ca je peux
