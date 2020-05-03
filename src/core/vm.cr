@@ -31,7 +31,7 @@ class ExecutionContext
   property state : Hash(BigInt, BigInt) = Hash(BigInt, BigInt).new
   getter origin : BigInt = BigInt.new(0)
   getter caller : BigInt = BigInt.new(0)
-  getter callvaluer : BigInt = BigInt.new(0)
+  getter callvalue : BigInt = BigInt.new(0)
   property calldata : Bytes = Bytes.empty
   getter code : Bytes = Bytes.empty
   getter gasprice : UInt64 = 0
