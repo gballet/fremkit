@@ -25,6 +25,7 @@
 
 require "big"
 
+require "./core/vm"
 require "./utils/bytecode"
 
 if ARGV.size < 1
@@ -45,19 +46,6 @@ stack = Array(BigInt).new
 state = Hash(BigInt, BigInt).new
 
 mem = Array(BigInt).new(4_000)
-
-class ExecutionContext
-  property gas : UInt64 = 0
-  getter address : BigInt = BigInt.new(0)
-  property state : Hash(BigInt, BigInt) = Hash(BigInt, BigInt).new
-  getter origin : BigInt = BigInt.new(0)
-  getter caller : BigInt = BigInt.new(0)
-  getter callvaluer : BigInt = BigInt.new(0)
-  property calldata : Bytes = Bytes.empty
-  getter code : Bytes = Bytes.empty
-  getter gasprice : UInt64 = 0
-  property retdata : Bytes = Bytes.empty
-end
 
 context = ExecutionContext.new
 
