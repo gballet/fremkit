@@ -1,3 +1,6 @@
 [submodule "evmone"]
 	path = evmone
 	url = https://github.com/chfast/evmone
+[submodule "tests"]
+	path = tests
+	url = https://github.com/ethereum/tests

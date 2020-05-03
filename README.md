@@ -6,7 +6,11 @@ More generally, it could be used as a toolkit for prototyping other blockchain t
 
 ## Installation
 
-TODO: Write installation instructions here
+```
+$ git clone https://github.com/gballet/fremkit
+$ git submodule init
+$ git submodule update
+```
 
 ## Usage
 
