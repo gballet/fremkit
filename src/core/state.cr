@@ -23,6 +23,8 @@
 #
 # For more information, please refer to <http://unlicense.org>
 
+require "big"
+
 module Fremkit::Core
   include Fremkit
 
@@ -41,7 +43,20 @@ module Fremkit::Core
     end
   end
 
-    abstract def set_word(address : Address, bytes : Bytes)
-    abstract def set(address : Address, bytes : Bytes)
+  # A simple state representation in which values are
+  # stored in a HashMap. This is intended to run tests
+  # for the VM.
+  class MapState < State(BigInt, BigInt)
+    def initialize
+      @state = Hash(BigInt, BigInt).new
+    end
+
+    def get_word(address : BigInt) : BigInt
+      @state[address]
+    end
+
+    def set_word(address : BigInt, bytes : BigInt)
+      @state[address] = bytes
+    end
   end
 end
