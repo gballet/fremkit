@@ -54,8 +54,7 @@ end
 
 class EVM < VM
   class EVMRegisters < Registers
-    def initialize(pc : UInt64)
-      @pc = pc
+    def initialize(@pc : UInt64)
     end
 
     def [](name : String) : Int
@@ -64,7 +63,7 @@ class EVM < VM
     end
   end
 
-  def initialize(@code : Bytes, @mem : Bytes, @context : ExecutionContext, @state : Fremkit::Core::State(Fremkit::Core::Address, BigInt))
+  def initialize(@code : Bytes, @mem : Bytes, @context : ExecutionContext, @state : Fremkit::Core::State(BigInt, BigInt))
     @pc = 0
     @done = false
     @stack = Array(BigInt).new
@@ -184,7 +183,7 @@ class EVM < VM
       when 0x55 # SSTORE
         addr = @stack.pop
         word = @stack.pop
-        state[addr] = word
+        @state[addr] = word
       when 0x56 # JUMP
         addr = @stack.pop
         pc = addr.to_u16 - 1
@@ -195,9 +194,9 @@ class EVM < VM
         # pc = addr.to_u16 - 1
         # end
       when 0x58 # PC
-        @stack.push BigInt.new(pc)
+        @stack.push BigInt.new(@pc)
       when 0x59 # MSIZE
-        @stack.push BigInt.new(mem.size)
+        @stack.push BigInt.new(@mem.size)
       when 0x5a # GAS
         @stack.push BigInt.new @context.gas
       when 0x5b # JUMPDEST
@@ -206,7 +205,7 @@ class EVM < VM
         datasize : UInt8 = instr - 0x60
         data = BigInt.new
         datasize.times do |i|
-          data += bytecode[pc + i] << (1*8)
+          data += @code[@pc + i] << (1*8)
         end
         @stack.push data
       when 0x80..0x8f # DUPn
@@ -221,10 +220,10 @@ class EVM < VM
         raise Exception.new "Unsupported instruction: #{instr}"
       end
     else
-      raise Exception.new "Invalid program counter: #{pc} < #{bytecode.size} = bytecode size"
+      raise Exception.new "Invalid program counter: #{@pc} < #{@code.size} = bytecode size"
     end
 
-    pc += 1
+    @pc += 1
   end
 
   def registers : Registers
