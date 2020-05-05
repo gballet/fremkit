@@ -107,7 +107,7 @@ module Fremkit
   module Eth
     struct AccountAddress < Address
       @[AlwaysInline]
-      def format_size : UInt32
+      def format_size : Int32
         40
       end
 
