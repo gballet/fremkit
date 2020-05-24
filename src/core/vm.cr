@@ -179,11 +179,13 @@ class EVM(T) < VM
         @stack.pop
       when 0x54 # SLOAD
         addr = @stack.pop
-        @stack.push (@state[addr] || BigInt.new)
+        storage = @state[@context.address].storage
+        @stack.push (storage[addr] || BigInt.new)
       when 0x55 # SSTORE
         addr = @stack.pop
         word = @stack.pop
-        @state[addr] = word
+        storage = @state[@context.address].storage
+        storage[addr] = word
       when 0x56 # JUMP
         addr = @stack.pop
         pc = addr.to_u16 - 1
