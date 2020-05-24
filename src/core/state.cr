@@ -46,16 +46,16 @@ module Fremkit::Core
   # A simple state representation in which values are
   # stored in a HashMap. This is intended to run tests
   # for the VM.
-  class MapState < State(BigInt, BigInt)
+  class MapState(T) < State(BigInt, T)
     def initialize
-      @state = Hash(BigInt, BigInt).new
+      @state = Hash(BigInt, T).new
     end
 
-    def get_word(address : BigInt) : BigInt
+    def get_word(address : BigInt) : T
       @state[address]
     end
 
-    def set_word(address : BigInt, bytes : BigInt)
+    def set_word(address : BigInt, bytes : T)
       @state[address] = bytes
     end
   end

@@ -52,7 +52,7 @@ abstract class VM
   abstract def run
 end
 
-class EVM < VM
+class EVM(T) < VM
   class EVMRegisters < Registers
     def initialize(@pc : UInt64)
     end
@@ -63,7 +63,7 @@ class EVM < VM
     end
   end
 
-  def initialize(@code : Bytes, @mem : Bytes, @context : ExecutionContext, @state : Fremkit::Core::State(BigInt, BigInt))
+  def initialize(@code : Bytes, @mem : Bytes, @context : ExecutionContext, @state : Fremkit::Core::State(BigInt, T))
     @pc = 0
     @done = false
     @stack = Array(BigInt).new
