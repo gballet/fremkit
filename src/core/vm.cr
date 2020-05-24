@@ -84,6 +84,10 @@ class EVM(T) < VM
         a = @stack.pop
         b = @stack.pop
         @stack.push (a * b)
+      when 3 # SUB
+        a = @stack.pop
+        b = @stack.pop
+        @stack.push (a - b)
       when 0x10 # LT
         a = @stack.pop
         b = @stack.pop
