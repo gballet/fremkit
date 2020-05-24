@@ -28,6 +28,39 @@ require "json"
 require "./spec_helper.cr"
 require "../src/core/vm"
 
+struct TestDataAccount
+  JSON.mapping(
+    balance: {type: BigInt, converter: TestDataAccount::ParseBigInt},
+    code: {type: Bytes, converter: TestDataAccount::ParseBytes},
+    nonce: {type: BigInt, converter: TestDataAccount::ParseBigInt},
+    storage: {type: Hash(BigInt, BigInt), converter: TestDataAccount::ParseStorage},
+  )
+
+  class ParseStorage
+    def self.from_json(pull : JSON::PullParser)
+      h = Hash(BigInt, BigInt).new
+      pull.read_object do |key, loc|
+        h[key[2..].to_big_i(16)] = pull.read_string[2..].to_big_i(16)
+      end
+      h
+    end
+  end
+
+  class ParseBytes
+    def self.from_json(pull : JSON::PullParser)
+      str = pull.read_string
+      str[2..].hexbytes
+    end
+  end
+
+  class ParseBigInt
+    def self.from_json(pull : JSON::PullParser)
+      str = pull.read_string
+      str[2..].to_big_i(16)
+    end
+  end
+end
+
 describe "Ethereum VM tests" do
   describe "Arithmetic tests" do
     dirname = "../tests/VMTests/vmArithmeticTest"
@@ -37,8 +70,8 @@ describe "Ethereum VM tests" do
       name = filename.gsub(/.json$/, "")
       desc = JSON.parse(File.read("#{dirname}/#{filename}"))
       it name do
-        state = Fremkit::Core::MapState(JSON::Any).new
-        pre = desc[name]["pre"].as_h
+        state = Fremkit::Core::MapState(TestDataAccount).new
+        pre = Hash(String, TestDataAccount).from_json desc[name]["pre"].to_json
         pre.each do |addr, account|
           state[addr[2..].to_big_i(16)] = account
         end
@@ -48,6 +81,7 @@ describe "Ethereum VM tests" do
         inputdata = exec["data"].to_s[2..].hexbytes
 
         evm = EVM.new code, Bytes.new(4000), ExecutionContext.new, state
+        evm.run
       end
     }
   end
