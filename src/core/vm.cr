@@ -221,6 +221,7 @@ class EVM(T) < VM
         datasize.times do |i|
           data += @code[@pc + i] << (1*8)
         end
+        @pc += instr - 0x60 + 1
         @stack.push data
       when 0x80..0x8f # DUPn
         depth : UInt8 = instr - 0x60
