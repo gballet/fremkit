@@ -39,6 +39,14 @@ class ExecutionContext
   getter code : Bytes = Bytes.empty
   getter gasprice : UInt64 = 0
   property retdata : Bytes = Bytes.empty
+
+  def set_caller(cller : BigInt)
+    @caller = cllr
+  end
+
+  def set_address(addr : BigInt)
+    @address = addr
+  end
 end
 
 abstract class Registers

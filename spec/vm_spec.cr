@@ -80,7 +80,9 @@ describe "Ethereum VM tests" do
         code = exec["code"].to_s[2..].hexbytes
         inputdata = exec["data"].to_s[2..].hexbytes
 
-        evm = EVM.new code, Bytes.new(4000), ExecutionContext.new, state
+        ctx = ExecutionContext.new
+        ctx.set_address(exec["address"].as_s[2..].to_big_i(16))
+        evm = EVM.new code, Bytes.new(4000), ctx, state
         evm.run
       end
     }
