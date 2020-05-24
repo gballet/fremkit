@@ -32,12 +32,14 @@ module Fremkit::Core
   abstract class State(A, T)
     abstract def get_word(address : A) : T
 
+    @[AlwaysInline]
     def [](address : A) : T
       get_word address
     end
 
     abstract def set_word(address : A, value : T)
 
+    @[AlwaysInline]
     def []=(address : A, value : T) : T
       set_word address, value
     end
