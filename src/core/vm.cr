@@ -235,7 +235,7 @@ class EVM(T) < VM
         raise Exception.new "Unsupported instruction: #{instr}"
       end
     else
-      raise Exception.new "Invalid program counter: #{@pc} < #{@code.size} = bytecode size"
+      @done = 1
     end
 
     @pc += 1
