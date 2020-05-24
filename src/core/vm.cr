@@ -216,12 +216,13 @@ class EVM(T) < VM
       when 0x5b # JUMPDEST
         # Does nothing
       when 0x60..0x7f # PUSHn
-        datasize : UInt8 = instr - 0x60
+        datasize : UInt8 = instr - 0x60 + 1
         data = BigInt.new
         datasize.times do |i|
-          data += @code[@pc + i] << (1*8)
+          data <<= 8
+          data |= @code[@pc + 1 + i]
         end
-        @pc += instr - 0x60 + 1
+        @pc += datasize
         @stack.push data
       when 0x80..0x8f # DUPn
         depth : UInt8 = instr - 0x60
