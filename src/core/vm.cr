@@ -61,6 +61,8 @@ abstract class VM
 end
 
 class EVM(T) < VM
+  UInt256Mask = (BigInt.new("1") << 256) - 1
+
   class EVMRegisters < Registers
     def initialize(@pc : UInt64)
     end
@@ -87,7 +89,8 @@ class EVM(T) < VM
       when 1 # ADD
         a = @stack.pop
         b = @stack.pop
-        @stack.push (a + b)
+        r = (a + b) & UInt256Mask
+        @stack.push r
       when 2 # MUL
         a = @stack.pop
         b = @stack.pop
@@ -197,7 +200,11 @@ class EVM(T) < VM
         addr = @stack.pop
         word = @stack.pop
         storage = @state[@context.address].storage
-        storage[addr] = word
+        if word.popcount == 0
+          storage.delete(addr)
+        else
+          storage[addr] = word
+        end
       when 0x56 # JUMP
         addr = @stack.pop
         pc = addr.to_u16 - 1
