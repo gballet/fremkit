@@ -75,7 +75,7 @@ class EVM < VM
 
       case instr
       when 0 # STOP
-        done = true
+        @done = true
       when 1 # ADD
         a = @stack.pop
         b = @stack.pop
