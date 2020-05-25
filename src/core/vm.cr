@@ -94,11 +94,37 @@ class EVM(T) < VM
       when 2 # MUL
         a = @stack.pop
         b = @stack.pop
-        @stack.push (a * b)
+        r = (a * b) & UInt256Mask
+        @stack.push r
       when 3 # SUB
         a = @stack.pop
         b = @stack.pop
-        @stack.push (a - b)
+        r = (a - b) & UInt256Mask
+        @stack.push r
+      when 4 # DIV
+        a = @stack.pop
+        b = @stack.pop
+        if b == 0
+          @stack.push b
+        else
+          @stack.push (a/b)
+        end
+      when 6 # MOD
+        a = @stack.pop
+        b = @stack.pop
+        @stack.push (a % b)
+      when 8 # ADDMOD
+        a = @stack.pop
+        b = @stack.pop
+        c = @stack.pop
+        r = (a + b) % c
+        @stack.push r
+      when 9 # MULMOD
+        a = @stack.pop
+        b = @stack.pop
+        c = @stack.pop
+        r = (a*b) % c
+        @stack.push r
       when 0x10 # LT
         a = @stack.pop
         b = @stack.pop
