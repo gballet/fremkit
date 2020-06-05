@@ -109,6 +109,16 @@ class EVM(T) < VM
         else
           @stack.push (a/b)
         end
+      when 5 # SDIV
+        a = @stack.pop
+        b = @stack.pop
+        if b == 0
+          @stack.push b
+        elsif b == -1 && a.popcount == 256
+          @stack.push a
+        else
+          @stack.push a.tdiv(b)
+        end
       when 6 # MOD
         a = @stack.pop
         b = @stack.pop
