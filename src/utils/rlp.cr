@@ -179,6 +179,20 @@ module Fremkit::Utils::RLP
     end
   end
 
+  def rlp_bytes_size(bytes : Bytes) : UInt32
+    if bytes[0] < 128
+      1
+    elsif bytes[0] < 183
+      bytes[0].to_32 - 128
+    else
+      length_length = bytes[0] - 183
+      val = 0.u32
+      length_length.times do |i|
+        val = (val << 8) + bytes[1 + i].u32
+      end
+    end
+  end
+
   # General version: serialize all items one by one. This won't support
   # payloads more than 64K in total.
   def encode(items : Array) : Bytes
