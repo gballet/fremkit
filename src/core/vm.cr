@@ -122,7 +122,11 @@ class EVM(T) < VM
       when 6 # MOD
         a = @stack.pop
         b = @stack.pop
-        @stack.push (a % b)
+        if b == 0
+          @stack.push b
+        else
+          @stack.push (a % b)
+        end
       when 8 # ADDMOD
         a = @stack.pop
         b = @stack.pop
