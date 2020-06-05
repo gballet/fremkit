@@ -107,7 +107,7 @@ class EVM(T) < VM
         if b == 0
           @stack.push b
         else
-          @stack.push (a/b)
+          @stack.push a.tdiv(b)
         end
       when 5 # SDIV
         a = @stack.pop
