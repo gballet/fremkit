@@ -127,6 +127,16 @@ class EVM(T) < VM
         else
           @stack.push (a % b)
         end
+      when 7 # SMOD
+        a = @stack.pop
+        b = @stack.pop
+        if b == 0
+          @stack.push b
+        elsif a < 0
+          @stack.push -(a % b)
+        else
+          @stack.push (a % b)
+        end
       when 8 # ADDMOD
         a = @stack.pop
         b = @stack.pop
