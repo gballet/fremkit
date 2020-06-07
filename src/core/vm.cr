@@ -317,7 +317,7 @@ class EVM(T) < VM
         @pc += datasize
         @stack.push data
       when 0x80..0x8f # DUPn
-        depth : UInt8 = instr - 0x60
+        depth : UInt8 = instr - 0x80
         @stack.push @stack[@stack.size - 1 - depth]
       when 0x90..0x9f # SWAPn
         sdepth : UInt8 = instr - 0x60
