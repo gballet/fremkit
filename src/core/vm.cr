@@ -242,6 +242,14 @@ class EVM(T) < VM
         @stack.push BigInt.new @context.gasprice
       when 0x50 # POP
         @stack.pop
+      when 0x52 # MSTORE
+        memaddr = @stack.pop
+        word = @stack.pop
+
+        32.times do |i|
+          @mem[memaddr.to_i + 31 - i] = (word & 0xFF).to_u8
+          word >>= 8
+        end
       when 0x54 # SLOAD
         addr = @stack.pop
         storage = @state[@context.address].storage
