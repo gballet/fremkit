@@ -77,6 +77,8 @@ class EVM(T) < VM
     @pc = 0
     @done = false
     @stack = Array(BigInt).new
+    @retaddr = -1
+    @retlength = -1
   end
 
   U256Overflow = BigInt.new(2)**256
@@ -325,6 +327,10 @@ class EVM(T) < VM
         tmp = @stack[@stack.size - 1 - sdepth]
         @stack[@stack.size - 1 - sdepth] = @stack[@stack.size - 1]
         @stack[@stack.size - 1] = tmp
+      when 0xf3 # RETURN
+        @retaddr = @stack.pop.to_i
+        @retlength = @stack.pop.to_i
+        @done = 1
       else
         raise Exception.new "Unsupported instruction: #{instr}"
       end
@@ -333,6 +339,11 @@ class EVM(T) < VM
     end
 
     @pc += 1
+  end
+
+  def retdata : Bytes
+    raise Exception.new "Trying to get return data on a contract that did not return properly" if @retaddr < 0 || @retlength < 0
+    @mem[@retaddr..@retaddr + @retlength]
   end
 
   def registers : Registers
