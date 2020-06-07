@@ -79,6 +79,8 @@ class EVM(T) < VM
     @stack = Array(BigInt).new
   end
 
+  U256Overflow = BigInt.new(2)**256
+
   def step
     if @pc < @code.size
       instr = @code[@pc]
@@ -112,12 +114,28 @@ class EVM(T) < VM
       when 5 # SDIV
         a = @stack.pop
         b = @stack.pop
+
+        if a.bit(255) == 1
+          a -= U256Overflow
+        end
+        if b.bit(255) == 1
+          b -= U256Overflow
+        end
+
         if b == 0
           @stack.push b
-        elsif b == -1 && a.popcount == 256
+        elsif b == -1 && a.popcount == 255
+          # This doesn't crash the tests, I suspect that this
+          # case isn't being tested. TODO test when fuzzing the
+          # EVM.
           @stack.push a
         else
-          @stack.push a.tdiv(b)
+          t = a.tdiv(b)
+          if t < 0
+            @stack.push (U256Overflow + t)
+          else
+            @stack.push t
+          end
         end
       when 6 # MOD
         a = @stack.pop
@@ -132,10 +150,19 @@ class EVM(T) < VM
         b = @stack.pop
         if b == 0
           @stack.push b
-        elsif a < 0
-          @stack.push -(a % b)
         else
-          @stack.push (a % b)
+          if a.bit(255) == 1
+            a -= U256Overflow
+          end
+          if b.bit(255) == 1
+            b -= U256Overflow
+          end
+
+          if a.sign == -1
+            @stack.push (U256Overflow - (a.abs % b.abs))
+          else
+            @stack.push (a % b.abs)
+          end
         end
       when 8 # ADDMOD
         a = @stack.pop
