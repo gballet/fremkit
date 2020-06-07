@@ -208,10 +208,7 @@ class EVM(T) < VM
         @stack.push (a ^ b)
       when 0x19 # NOT
         n = @stack.pop
-        o = BigInt.new(0)
-        256.times do |bit|
-          o |= (1 << bit) if n.bit(bit) == 0
-        end
+        @stack.push ~n
       when 0x1a # BYTE
         byte_num = @stack.pop
         src = @stack.pop
