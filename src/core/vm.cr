@@ -111,7 +111,7 @@ class EVM(T) < VM
         else
           @stack.push a.tdiv(b)
         end
-      when 5 # SDIV
+      when 0x05 # SDIV
         a = @stack.pop
         b = @stack.pop
 
@@ -159,7 +159,8 @@ class EVM(T) < VM
           end
 
           if a.sign == -1
-            @stack.push (U256Overflow - (a.abs % b.abs))
+            x = (U256Overflow - (a.abs % b.abs)) % U256Overflow
+            @stack.push x
           else
             @stack.push (a % b.abs)
           end
