@@ -179,6 +179,24 @@ class EVM(T) < VM
         c = @stack.pop
         r = (a*b) % c
         @stack.push r
+      when 0x0b # SIGNEXTEND
+        nbits = @stack.pop
+        int = @stack.pop
+
+        raise "Bit index is too high 8*(#{nbits}+1) > 256" if (nbits + 1)*8 > 256
+        t = 256 - 8*(nbits.to_u8 + 1)
+        bt = int.bit(t)
+
+        (t + 1..256).each do |idx|
+          if bt != int.bit(idx)
+            if bt == 0
+              int ^= 1 << idx
+            else
+              int |= 1 << idx
+            end
+          end
+        end
+        @stack.push int
       when 0x10 # LT
         a = @stack.pop
         b = @stack.pop
