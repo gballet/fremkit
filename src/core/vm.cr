@@ -306,7 +306,7 @@ class EVM(T) < VM
       when 0x54 # SLOAD
         addr = @stack.pop
         storage = @state[@context.address].storage
-        @stack.push (storage[addr] || BigInt.new)
+        @stack.push (storage[addr]? || BigInt.new)
       when 0x55 # SSTORE
         addr = @stack.pop
         word = @stack.pop
