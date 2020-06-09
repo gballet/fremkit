@@ -75,11 +75,10 @@ describe "Ethereum VM tests" do
         pre.each do |addr, account|
           state[addr[2..].to_big_i(16)] = account
         end
-        post = Hash(String, TestDataAccount).from_json desc[name]["post"].to_json
+        post = Hash(String, TestDataAccount).from_json (desc[name]["post"]? || Hash(Nil, Nil).new).to_json
 
         exec = desc[name]["exec"]
         code = exec["code"].to_s[2..].hexbytes
-        inputdata = exec["data"].to_s[2..].hexbytes
 
         ctx = ExecutionContext.new
         ctx.set_address(exec["address"].as_s[2..].to_big_i(16))
