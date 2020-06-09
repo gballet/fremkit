@@ -180,23 +180,22 @@ class EVM(T) < VM
         r = (a*b) % c
         @stack.push r
       when 0x0b # SIGNEXTEND
-        nbits = @stack.pop
-        int = @stack.pop
+        b = @stack.pop
+        if b < 31
+          int = @stack.pop
 
-        raise "Bit index is too high 8*(#{nbits}+1) > 256" if (nbits + 1)*8 > 256
-        t = 256 - 8*(nbits.to_u8 + 1)
-        bt = int.bit(t)
+          bit = b*8 + 7
 
-        (t + 1..256).each do |idx|
-          if bt != int.bit(idx)
-            if bt == 0
-              int ^= 1 << idx
-            else
-              int |= 1 << idx
-            end
+          x = BigInt.new(1) << bit
+          mask = x - 1
+          if int.bit(bit) == 1
+            val = (int | ~mask)
+            val += UInt256Mask + 1 if val < 0
+            @stack.push val
+          else
+            @stack.push (int & mask)
           end
         end
-        @stack.push int
       when 0x10 # LT
         a = @stack.pop
         b = @stack.pop
