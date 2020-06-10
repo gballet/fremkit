@@ -10,6 +10,11 @@ targets:
   evm:
     main: src/evm.cr
 
+dependencies:
+  sha3:
+    github: OscarBarrett/crystal-sha3
+    version: ~> 0.3
+
 crystal: 0.33.0
 
 license: MIT

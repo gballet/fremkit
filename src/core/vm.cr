@@ -230,6 +230,10 @@ class EVM(T) < VM
         byte_num = @stack.pop
         src = @stack.pop
         @stack.push ((src >> (8*byte_num)) & 0xFF)
+      when 0x20 # SHA3
+        addr = @stack.pop.to_i
+        length = @stack.pop.to_i
+        @stack.push Digest::SHA3.hexdigest(@mem[addr..addr + length]).to_big_i(16)
       when 0x30 # ADDRESS
         @stack.push @context.address
       when 0x31 # BALANCE
