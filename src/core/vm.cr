@@ -238,6 +238,11 @@ class EVM(T) < VM
           addr = @stack.pop.to_i64
           length = @stack.pop.to_i64
           if @mem.size < addr + length
+            new_mem_size = addr + length
+            new_mem_size += new_mem_size % 32
+            new_mem = Bytes.new(new_mem_size)
+            new_mem.copy_from(@mem)
+            @mem = new_mem
           end
           digest = Digest::Keccak3.new(256)
           @stack.push digest.update(@mem[addr...addr + length]).hexdigest.to_big_i(16)
