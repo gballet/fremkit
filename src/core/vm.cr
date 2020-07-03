@@ -232,10 +232,16 @@ class EVM(T) < VM
         src = @stack.pop
         @stack.push ((src >> (8*byte_num)) & 0xFF)
       when 0x20 # SHA3
-        addr = @stack.pop.to_i
-        length = @stack.pop.to_i
-        digest = Digest::Keccak3.new(256)
-        @stack.push digest.update(@mem[addr...addr + length]).hexdigest.to_big_i(16)
+        if @stack.size < 2 || @stack[0] > UInt32::MAX || @stack[1] > UInt32::MAX
+          @done = true
+        else
+          addr = @stack.pop.to_i64
+          length = @stack.pop.to_i64
+          if @mem.size < addr + length
+          end
+          digest = Digest::Keccak3.new(256)
+          @stack.push digest.update(@mem[addr...addr + length]).hexdigest.to_big_i(16)
+        end
       when 0x30 # ADDRESS
         @stack.push @context.address
       when 0x31 # BALANCE
