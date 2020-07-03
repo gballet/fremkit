@@ -27,6 +27,7 @@ require "big"
 
 require "./state"
 require "../common/address"
+require "sha3"
 
 class ExecutionContext
   property gas : UInt64 = 0
