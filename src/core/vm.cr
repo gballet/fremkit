@@ -80,6 +80,8 @@ class EVM(T) < VM
     @stack = Array(BigInt).new
     @retaddr = -1
     @retlength = -1
+    @logs = Array(Bytes).new
+    @topics = Array(BigInt).new
   end
 
   U256Overflow = BigInt.new(2)**256
@@ -367,6 +369,14 @@ class EVM(T) < VM
         tmp = @stack[@stack.size - 1 - sdepth]
         @stack[@stack.size - 1 - sdepth] = @stack[@stack.size - 1]
         @stack[@stack.size - 1] = tmp
+      when 0xa0..0xa4 # LOGn
+        topic_length : UInt8 = instr - 0xa0
+        addr = @stack.pop.to_i
+        length = @stack.pop.to_i
+        @logs.push @mem[addr...addr + length]
+        topic_length.times do |topic_n|
+          @topics.push @stack.pop
+        end
       when 0xf3 # RETURN
         @retaddr = @stack.pop.to_i
         @retlength = @stack.pop.to_i
