@@ -322,6 +322,12 @@ class EVM(T) < VM
           @mem[memaddr.to_i + 31 - i] = (word & 0xFF).to_u8
           word >>= 8
         end
+      when 0x53 # MSTORE8
+        puts @stack.inspect
+        memaddr = @stack.pop
+        word = @stack.pop
+
+        @mem[memaddr] = (word & 0xFF).to_u8
       when 0x54 # SLOAD
         addr = @stack.pop
         storage = @state[@context.address].storage
