@@ -127,4 +127,37 @@ describe "Ethereum VM tests" do
       end
     }
   end
+
+  describe "Log tests" do
+    dirname = "../tests/VMTests/vmLogTest"
+    dir = Dir.new(dirname)
+    dir.each { |filename|
+      next if filename !~ /.json$/
+      name = filename.gsub(/.json$/, "")
+      desc = JSON.parse(File.read("#{dirname}/#{filename}"))
+      it name do
+        state = Fremkit::Core::MapState(TestDataAccount).new
+        pre = Hash(String, TestDataAccount).from_json desc[name]["pre"].to_json
+        pre.each do |addr, account|
+          state[addr[2..].to_big_i(16)] = account
+        end
+        post = Hash(String, TestDataAccount).from_json (desc[name]["post"]? || Hash(Nil, Nil).new).to_json
+
+        exec = desc[name]["exec"]
+        code = exec["code"].to_s[2..].hexbytes
+
+        ctx = ExecutionContext.new
+        ctx.set_address(exec["address"].as_s[2..].to_big_i(16))
+        ctx.calldata = exec["data"].to_s[2..].hexbytes
+
+        evm = EVM.new code, Bytes.new(4000), ctx, state
+        evm.run
+
+        post.each do |addr, account|
+          res_account = state[addr[2..].to_big_i(16)]
+          res_account.should eq account
+        end
+      end
+    }
+  end
 end
