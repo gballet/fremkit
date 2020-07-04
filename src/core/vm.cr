@@ -377,11 +377,15 @@ class EVM(T) < VM
         @stack[@stack.size - 1] = tmp
       when 0xa0..0xa4 # LOGn
         topic_length : UInt8 = instr - 0xa0
-        addr = @stack.pop.to_i
-        length = @stack.pop.to_i
-        @logs.push @mem[addr...addr + length]
-        topic_length.times do |topic_n|
-          @topics.push @stack.pop
+        if @stack.size < 2 + topic_length || @stack[@stack.size - 1] > UInt32::MAX || @stack[@stack.size - 2] > UInt32::MAX
+          @done
+        else
+          addr = @stack.pop.to_i
+          length = @stack.pop.to_i
+          @logs.push @mem[addr...addr + length]
+          topic_length.times do |topic_n|
+            @topics.push @stack.pop
+          end
         end
       when 0xf3 # RETURN
         @retaddr = @stack.pop.to_i
