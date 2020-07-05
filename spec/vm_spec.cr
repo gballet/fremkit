@@ -61,9 +61,11 @@ struct TestDataAccount
   end
 end
 
+VMTestDir = "tests/VMTests"
+
 describe "Ethereum VM tests" do
   describe "Arithmetic tests" do
-    dirname = "../tests/VMTests/vmArithmeticTest"
+    dirname = "#{VMTestDir}/vmArithmeticTest"
     dir = Dir.new(dirname)
     dir.each { |filename|
       next if filename !~ /.json$/
@@ -96,7 +98,7 @@ describe "Ethereum VM tests" do
   end
 
   describe "Sha3 tests" do
-    dirname = "../tests/VMTests/vmSha3Test"
+    dirname = "#{VMTestDir}/vmSha3Test"
     dir = Dir.new(dirname)
     dir.each { |filename|
       next if filename !~ /.json$/
@@ -129,7 +131,7 @@ describe "Ethereum VM tests" do
   end
 
   describe "Log tests" do
-    dirname = "../tests/VMTests/vmLogTest"
+    dirname = "#{VMTestDir}/vmLogTest"
     dir = Dir.new(dirname)
     dir.each { |filename|
       next if filename !~ /.json$/
