@@ -174,14 +174,20 @@ class EVM(T) < VM
         a = @stack.pop
         b = @stack.pop
         c = @stack.pop
-        r = (a + b) % c
-        @stack.push r
+        if c == 0
+          @stack.push BigInt.new(0)
+        else
+          @stack.push ((a + b) % c)
+        end
       when 9 # MULMOD
         a = @stack.pop
         b = @stack.pop
         c = @stack.pop
-        r = (a*b) % c
-        @stack.push r
+        if c == 0
+          @stack.push BigInt.new(0)
+        else
+          @stack.push ((a*b) % c)
+        end
       when 0x0a # EXP
         a = @stack.pop
         b = @stack.pop
