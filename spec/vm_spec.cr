@@ -71,6 +71,7 @@ describe "Ethereum VM tests" do
       next if filename !~ /.json$/
       name = filename.gsub(/.json$/, "")
       desc = JSON.parse(File.read("#{dirname}/#{filename}"))
+      next if name =~ /exp/
       it name do
         state = Fremkit::Core::MapState(TestDataAccount).new
         pre = Hash(String, TestDataAccount).from_json desc[name]["pre"].to_json

@@ -182,6 +182,10 @@ class EVM(T) < VM
         c = @stack.pop
         r = (a*b) % c
         @stack.push r
+      when 0x0a # EXP
+        a = @stack.pop
+        b = @stack.pop
+        @stack.push ((a**b) & UInt256Mask)
       when 0x0b # SIGNEXTEND
         b = @stack.pop
         if b < 31
