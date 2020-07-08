@@ -376,12 +376,10 @@ class EVM(T) < VM
       when 0x56 # JUMP
         addr = @stack.pop
         pc = addr.to_u16 - 1
-        # when 0x58 # JUMPI
-        # addr = @stack.pop
-        # cond = @stack.pop
-        # unless cond.zero?
-        # pc = addr.to_u16 - 1
-        # end
+      when 0x57 # JUMPI
+        to = @stack.pop
+        cond = @stack.pop
+        pc = to.to_u16 - 1 if cond != 0
       when 0x58 # PC
         @stack.push BigInt.new(@pc)
       when 0x59 # MSIZE
