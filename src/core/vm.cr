@@ -238,7 +238,9 @@ class EVM(T) < VM
         @stack.push (a ^ b)
       when 0x19 # NOT
         n = @stack.pop
-        @stack.push ~n
+        r = ~n
+        r += UInt256Mask + 1 if r < 0
+        @stack.push r
       when 0x1a # BYTE
         byte_num = @stack.pop
         src = @stack.pop
