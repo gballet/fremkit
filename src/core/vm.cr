@@ -403,7 +403,7 @@ class EVM(T) < VM
         depth : UInt8 = instr - 0x80
         @stack.push @stack[@stack.size - 1 - depth]
       when 0x90..0x9f # SWAPn
-        sdepth : UInt8 = instr - 0x60
+        sdepth : UInt8 = instr - 0x90 + 1
         tmp = @stack[@stack.size - 1 - sdepth]
         @stack[@stack.size - 1 - sdepth] = @stack[@stack.size - 1]
         @stack[@stack.size - 1] = tmp
