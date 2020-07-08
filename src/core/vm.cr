@@ -393,7 +393,9 @@ class EVM(T) < VM
         data = BigInt.new
         datasize.times do |i|
           data <<= 8
-          data |= @code[@pc + 1 + i]
+          if @code.size > @pc + 1 + i
+            data |= @code[@pc + 1 + i]
+          end
         end
         @pc += datasize
         @stack.push data
