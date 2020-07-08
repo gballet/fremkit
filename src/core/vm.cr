@@ -217,6 +217,26 @@ class EVM(T) < VM
         a = @stack.pop
         b = @stack.pop
         @stack.push BigInt.new(a > b ? 1 : 0)
+      when 0x12 # SLT
+        a = @stack.pop
+        b = @stack.pop
+        if a.bit(255) == 1
+          a -= U256Overflow
+        end
+        if b.bit(255) == 1
+          b -= U256Overflow
+        end
+        @stack.push BigInt.new(a < b ? 1 : 0)
+      when 0x13 # SGT
+        a = @stack.pop
+        b = @stack.pop
+        if a.bit(255) == 1
+          a -= U256Overflow
+        end
+        if b.bit(255) == 1
+          b -= U256Overflow
+        end
+        @stack.push BigInt.new(a > b ? 1 : 0)
       when 0x14 # EQ
         a = @stack.pop
         b = @stack.pop
