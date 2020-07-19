@@ -64,7 +64,7 @@ end
 VMTestDir = "tests/VMTests"
 
 describe "Ethereum VM tests" do
-  describe "Arithmetic tests" do
+  describe "Arithmetic" do
     dirname = "#{VMTestDir}/vmArithmeticTest"
     dir = Dir.new(dirname)
     dir.each { |filename|
@@ -98,7 +98,7 @@ describe "Ethereum VM tests" do
     }
   end
 
-  describe "Sha3 tests" do
+  describe "Sha3" do
     dirname = "#{VMTestDir}/vmSha3Test"
     dir = Dir.new(dirname)
     dir.each { |filename|
@@ -131,7 +131,7 @@ describe "Ethereum VM tests" do
     }
   end
 
-  describe "Log tests" do
+  describe "Log" do
     dirname = "#{VMTestDir}/vmLogTest"
     dir = Dir.new(dirname)
     dir.each { |filename|
@@ -195,12 +195,244 @@ describe "Ethereum VM tests" do
           res_account.should eq account
         end
 
+        # TODO check log value
       end
     }
   end
 
-  describe "Push/Dup/Swap tests" do
+  describe "Push/Dup/Swap" do
     dirname = "#{VMTestDir}/vmPushDupSwapTest"
+    dir = Dir.new(dirname)
+    dir.each { |filename|
+      next if filename !~ /.json$/
+      name = filename.gsub(/.json$/, "")
+      desc = JSON.parse(File.read("#{dirname}/#{filename}"))
+      it name do
+        state = Fremkit::Core::MapState(TestDataAccount).new
+        pre = Hash(String, TestDataAccount).from_json desc[name]["pre"].to_json
+        pre.each do |addr, account|
+          state[addr[2..].to_big_i(16)] = account
+        end
+        post = Hash(String, TestDataAccount).from_json (desc[name]["post"]? || Hash(Nil, Nil).new).to_json
+
+        exec = desc[name]["exec"]
+        code = exec["code"].to_s[2..].hexbytes
+
+        ctx = ExecutionContext.new
+        ctx.set_address(exec["address"].as_s[2..].to_big_i(16))
+        ctx.calldata = exec["data"].to_s[2..].hexbytes
+
+        evm = EVM.new code, Bytes.new(4000), ctx, state
+        evm.run
+
+        post.each do |addr, account|
+          res_account = state[addr[2..].to_big_i(16)]
+          res_account.should eq account
+        end
+      end
+    }
+  end
+
+  describe "Block info" do
+    dirname = "#{VMTestDir}/vmBlockInfoTest"
+    dir = Dir.new(dirname)
+    dir.each { |filename|
+      next if filename !~ /.json$/
+      name = filename.gsub(/.json$/, "")
+      desc = JSON.parse(File.read("#{dirname}/#{filename}"))
+      it name do
+        state = Fremkit::Core::MapState(TestDataAccount).new
+        pre = Hash(String, TestDataAccount).from_json desc[name]["pre"].to_json
+        pre.each do |addr, account|
+          state[addr[2..].to_big_i(16)] = account
+        end
+        post = Hash(String, TestDataAccount).from_json (desc[name]["post"]? || Hash(Nil, Nil).new).to_json
+
+        exec = desc[name]["exec"]
+        code = exec["code"].to_s[2..].hexbytes
+
+        ctx = ExecutionContext.new
+        ctx.set_address(exec["address"].as_s[2..].to_big_i(16))
+        ctx.calldata = exec["data"].to_s[2..].hexbytes
+
+        evm = EVM.new code, Bytes.new(4000), ctx, state
+        evm.run
+
+        post.each do |addr, account|
+          res_account = state[addr[2..].to_big_i(16)]
+          res_account.should eq account
+        end
+      end
+    }
+  end
+
+  describe "Environment info" do
+    dirname = "#{VMTestDir}/vmEnvironmentalInfo"
+    dir = Dir.new(dirname)
+    dir.each { |filename|
+      next if filename !~ /.json$/
+      name = filename.gsub(/.json$/, "")
+      desc = JSON.parse(File.read("#{dirname}/#{filename}"))
+      it name do
+        state = Fremkit::Core::MapState(TestDataAccount).new
+        pre = Hash(String, TestDataAccount).from_json desc[name]["pre"].to_json
+        pre.each do |addr, account|
+          state[addr[2..].to_big_i(16)] = account
+        end
+        post = Hash(String, TestDataAccount).from_json (desc[name]["post"]? || Hash(Nil, Nil).new).to_json
+
+        exec = desc[name]["exec"]
+        code = exec["code"].to_s[2..].hexbytes
+
+        ctx = ExecutionContext.new
+        ctx.set_address(exec["address"].as_s[2..].to_big_i(16))
+        ctx.calldata = exec["data"].to_s[2..].hexbytes
+
+        evm = EVM.new code, Bytes.new(4000), ctx, state
+        evm.run
+
+        post.each do |addr, account|
+          res_account = state[addr[2..].to_big_i(16)]
+          res_account.should eq account
+        end
+      end
+    }
+  end
+
+  describe "IO and flow operations" do
+    dirname = "#{VMTestDir}/vmIOandFlowOperations"
+    dir = Dir.new(dirname)
+    dir.each { |filename|
+      next if filename !~ /.json$/
+      name = filename.gsub(/.json$/, "")
+      desc = JSON.parse(File.read("#{dirname}/#{filename}"))
+      it name do
+        state = Fremkit::Core::MapState(TestDataAccount).new
+        pre = Hash(String, TestDataAccount).from_json desc[name]["pre"].to_json
+        pre.each do |addr, account|
+          state[addr[2..].to_big_i(16)] = account
+        end
+        post = Hash(String, TestDataAccount).from_json (desc[name]["post"]? || Hash(Nil, Nil).new).to_json
+
+        exec = desc[name]["exec"]
+        code = exec["code"].to_s[2..].hexbytes
+
+        ctx = ExecutionContext.new
+        ctx.set_address(exec["address"].as_s[2..].to_big_i(16))
+        ctx.calldata = exec["data"].to_s[2..].hexbytes
+
+        evm = EVM.new code, Bytes.new(4000), ctx, state
+        evm.run
+
+        post.each do |addr, account|
+          res_account = state[addr[2..].to_big_i(16)]
+          res_account.should eq account
+        end
+      end
+    }
+  end
+
+  # describe "Performance" do
+  # dirname = "#{VMTestDir}/vmPerformance"
+  # dir = Dir.new(dirname)
+  # dir.each { |filename|
+  # next if filename !~ /.json$/
+  # name = filename.gsub(/.json$/, "")
+  # desc = JSON.parse(File.read("#{dirname}/#{filename}"))
+  # it name do
+  # state = Fremkit::Core::MapState(TestDataAccount).new
+  # pre = Hash(String, TestDataAccount).from_json desc[name]["pre"].to_json
+  # pre.each do |addr, account|
+  # state[addr[2..].to_big_i(16)] = account
+  # end
+  # post = Hash(String, TestDataAccount).from_json (desc[name]["post"]? || Hash(Nil, Nil).new).to_json
+
+  # exec = desc[name]["exec"]
+  # code = exec["code"].to_s[2..].hexbytes
+
+  # ctx = ExecutionContext.new
+  # ctx.set_address(exec["address"].as_s[2..].to_big_i(16))
+  # ctx.calldata = exec["data"].to_s[2..].hexbytes
+
+  # evm = EVM.new code, Bytes.new(4000), ctx, state
+  # evm.run
+
+  # post.each do |addr, account|
+  # res_account = state[addr[2..].to_big_i(16)]
+  # res_account.should eq account
+  # end
+  # end
+  # }
+  # end
+
+  describe "Random" do
+    dirname = "#{VMTestDir}/vmRandomTest"
+    dir = Dir.new(dirname)
+    dir.each { |filename|
+      next if filename !~ /.json$/
+      name = filename.gsub(/.json$/, "")
+      desc = JSON.parse(File.read("#{dirname}/#{filename}"))
+      it name do
+        state = Fremkit::Core::MapState(TestDataAccount).new
+        pre = Hash(String, TestDataAccount).from_json desc[name]["pre"].to_json
+        pre.each do |addr, account|
+          state[addr[2..].to_big_i(16)] = account
+        end
+        post = Hash(String, TestDataAccount).from_json (desc[name]["post"]? || Hash(Nil, Nil).new).to_json
+
+        exec = desc[name]["exec"]
+        code = exec["code"].to_s[2..].hexbytes
+
+        ctx = ExecutionContext.new
+        ctx.set_address(exec["address"].as_s[2..].to_big_i(16))
+        ctx.calldata = exec["data"].to_s[2..].hexbytes
+
+        evm = EVM.new code, Bytes.new(4000), ctx, state
+        evm.run
+
+        post.each do |addr, account|
+          res_account = state[addr[2..].to_big_i(16)]
+          res_account.should eq account
+        end
+      end
+    }
+  end
+
+  describe "System operations" do
+    dirname = "#{VMTestDir}/vmSystemOperations"
+    dir = Dir.new(dirname)
+    dir.each { |filename|
+      next if filename !~ /.json$/
+      name = filename.gsub(/.json$/, "")
+      desc = JSON.parse(File.read("#{dirname}/#{filename}"))
+      it name do
+        state = Fremkit::Core::MapState(TestDataAccount).new
+        pre = Hash(String, TestDataAccount).from_json desc[name]["pre"].to_json
+        pre.each do |addr, account|
+          state[addr[2..].to_big_i(16)] = account
+        end
+        post = Hash(String, TestDataAccount).from_json (desc[name]["post"]? || Hash(Nil, Nil).new).to_json
+
+        exec = desc[name]["exec"]
+        code = exec["code"].to_s[2..].hexbytes
+
+        ctx = ExecutionContext.new
+        ctx.set_address(exec["address"].as_s[2..].to_big_i(16))
+        ctx.calldata = exec["data"].to_s[2..].hexbytes
+
+        evm = EVM.new code, Bytes.new(4000), ctx, state
+        evm.run
+
+        post.each do |addr, account|
+          res_account = state[addr[2..].to_big_i(16)]
+          res_account.should eq account
+        end
+      end
+    }
+  end
+
+  describe "Tests" do
+    dirname = "#{VMTestDir}/vmTests"
     dir = Dir.new(dirname)
     dir.each { |filename|
       next if filename !~ /.json$/
