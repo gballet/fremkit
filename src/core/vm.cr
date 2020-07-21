@@ -40,6 +40,7 @@ class ExecutionContext
   getter code : Bytes = Bytes.empty
   getter gasprice : UInt64 = 0
   property retdata : Bytes = Bytes.empty
+  getter block_num : BigInt = BigInt.new(0)
 
   def set_caller(cller : BigInt)
     @caller = cllr
@@ -335,6 +336,8 @@ class EVM(T) < VM
         end
       when 0x3a # GASPRICE
         @stack.push BigInt.new @context.gasprice
+      when 0x43 # NUMBER
+        @stack.push @context.block_num
       when 0x50 # POP
         @stack.pop
       when 0x51 # MLOAD
