@@ -5,7 +5,14 @@ module DevP2P
 
   module Messages
     class Hello < Message
+      @protocol_version = 5u8
+      @client_id : Bytes | Nil
+      @caps : Array({String, UInt8}) = [{"eth", 64u8}]
+      @listen_port : UInt16 = 0
+      @node_id : Bytes | Nil
+
       def payload : Bytes
+        self.to_rlp
       end
     end
 
