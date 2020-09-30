@@ -28,12 +28,15 @@ require "./spec_helper.cr"
 include Fremkit::Utils::RLP
 
 struct SandWorm
+  getter :age
+  getter :length
+
   def initialize(@age : UInt32, @length : UInt32)
   end
 end
 
 struct Harvester
-  @@maker : String = ""
+  @@maker : String = "ix industries"
 
   def initialize(@fuel : UInt32)
   end
@@ -171,7 +174,13 @@ describe "RLP tests" do
 
   it "should be able to encode a struct with class variables" do
     harvester = Harvester.new(90)
-    harvester.set_maker("ix industries")
     harvester.to_rlp.should eq Bytes[207, 141, 105, 120, 32, 105, 110, 100, 117, 115, 116, 114, 105, 101, 115, 90]
+  end
+
+  it "shoud be able to decode a structure" do
+    worm, off = SandWorm.from_rlp(Bytes[197, 131, 1, 134, 160, 20])
+    off.should eq 6
+    worm.length.should eq 20
+    worm.age.should eq 100_000
   end
 end

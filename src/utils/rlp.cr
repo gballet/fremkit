@@ -162,7 +162,40 @@ struct Struct
     write_header(encoding.to_slice, payload_size.to_u32)
   end
 
-  def Struct.from_rlp(rlp : Bytes)
+  def Struct.from_rlp(rlp : Bytes) : {self, UInt32}
+    {{@type.name}}.allocate.from_rlp(rlp)
+  end
+
+  def from_rlp(rlp : Bytes) : {self, UInt32}
+    # The structure is encoded as a list, turn it into an array
+    payload_size = case rlp[0]
+                   when 0..191
+                     raise DecodeException.new
+                   when 192..247
+                     rlp[0] - 192
+                   else
+                     size_size = rlp[0] - 247
+                     size = 0u64
+                     size_size.times do |b|
+                       size = rlp[1 + b] + (size << 8)
+                     end
+                     size
+                   end
+    if rlp.size != payload_size + 1 # bug if in 248..255 range
+      raise DecodeException.new
+    end
+    off : UInt32 = 1 # same bug
+
+    {% for var in @type.class_vars %}
+	    @@{{var.name}}, o = {{var.type}}.from_rlp(rlp[off..])
+	    off += o
+    {% end %}
+    {% for var in @type.instance_vars %}
+	    @{{var.name}}, o = {{var.type}}.from_rlp(rlp[off..])
+	    off += o
+    {% end %}
+
+    {self, off}
   end
 end
 
