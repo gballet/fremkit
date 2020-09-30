@@ -146,6 +146,26 @@ class Hash(K, V)
   end
 end
 
+struct Struct
+  def to_rlp : Bytes
+    encoding = alloc_with_header
+    puts {{@type.name}}
+    {% for var in @type.class_vars %}
+	    encoding.write @@{{var.name}}.to_rlp
+    {% end %}
+
+    {% for var in @type.instance_vars %}
+	    encoding.write @{{var.name}}.to_rlp
+    {% end %}
+    payload_size = encoding.pos - 3
+    puts encoding
+    write_header(encoding.to_slice, payload_size.to_u32)
+  end
+
+  def Struct.from_rlp(rlp : Bytes)
+  end
+end
+
 # Helper functions for RLP
 module Fremkit::Utils::RLP
   class DecodeException < Exception
