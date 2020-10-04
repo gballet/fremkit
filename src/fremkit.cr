@@ -29,6 +29,7 @@ require "./core/block"
 require "./core/state"
 require "./core/tx"
 require "./core/transition"
+require "./common/trie"
 
 module Fremkit
   VERSION = "0.1.0"
