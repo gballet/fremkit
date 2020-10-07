@@ -61,6 +61,9 @@ module Fremkit
       end
 
       class ExtNode < TrieNode
+        getter prefix
+        getter child
+
         def initialize(@prefix : Bytes, @child : TrieNode)
         end
 
@@ -79,19 +82,17 @@ module Fremkit
       end
 
       class BranchNode < TrieNode
-        class BranchNodeException < Exception
+        class BranchNodeIndexException < Exception
         end
 
-        InitValue = {EmptyNode.get, EmptyNode.get, EmptyNode.get, EmptyNode.get, EmptyNode.get, EmptyNode.get, EmptyNode.get, EmptyNode.get, EmptyNode.get, EmptyNode.get, EmptyNode.get, EmptyNode.get, EmptyNode.get, EmptyNode.get, EmptyNode.get, EmptyNode.get, Bytes.empty}
-
-        children_and_value : Tuple(TrieNode, TrieNode, TrieNode, TrieNode, TrieNode, TrieNode, TrieNode, TrieNode, TrieNode, TrieNode, TrieNode, TrieNode, TrieNode, TrieNode, TrieNode, TrieNode, Bytes) = InitValue
+        @children_and_value : StaticArray(TrieNode | Bytes, 17) = StaticArray[EmptyNode.get.as(TrieNode).as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), Bytes.empty]
 
         def [](idx : Uint8) : TrieNode | Bytes
           raise BranchNodeIndexException.new("getting index > 16 in branch node") if idx > 16
           @children_and_value[idx]
         end
 
-        def []=(idx : Uint8, child : TrieNode | Bytes)
+        def []=(idx : UInt8, child : TrieNode | Bytes)
           case idx
           when 0..15
             @children_and_value[idx] = child.as(TrieNode)
