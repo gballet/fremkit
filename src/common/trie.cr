@@ -73,7 +73,7 @@ module Fremkit
         end
 
         def to_rlp : Bytes
-          {prefix.to_hex_prefix(false), child}.to_rlp
+          {hex_prefix(@prefix, false), child}.to_rlp
         end
       end
 
@@ -82,7 +82,7 @@ module Fremkit
         end
 
         def to_rlp : Bytes
-          {prefix.to_hex_prefix(true), value}.to_rlp
+          {hex_prefix(@prefix, true), @value}.to_rlp
         end
       end
 
