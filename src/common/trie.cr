@@ -44,22 +44,25 @@ module Fremkit
     class Trie < MerkleTree(Bytes, Bytes, Bytes)
       EmptyRoot = Bytes[86, 232, 31, 23, 27, 204, 85, 166, 255, 131, 69, 230, 146, 192, 248, 110, 91, 72, 224, 27, 153, 108, 173, 192, 1, 98, 47, 181, 227, 99, 180, 33]
 
-      class TrieNode
+      abstract class TrieNode
         def hash : Bytes
           digest = Digest::Keccak3.new(256)
           digest.update(self.to_rlp).digest
         end
-      end
 
-      class EmptyNode < TrieNode
-        def hash : Bytes
-          return EmptyRoot
+        def hex_prefix(key : Bytes, leaf?) : Bytes
+          length = (key.size / 2).to_i
+          ret = Bytes.new(length + 1)
+          ret[0] = 16u8 | key[0] if key.size.odd?
+          ret[0] |= 32 if leaf?
+          key.each.with_index(key.size.odd? ? 1 : 0) do |x, idx|
+            off = 1 + ((idx - (key.size.odd? ? 1 : 0))/2).to_u32
+            ret[off] |= (idx.odd? ^ key.size.odd?) ? key[idx] << 4 : key[idx]
+          end
+          ret
         end
 
-        def self.get : self
-          @@instance = EmptyNode.new if @@instance.nil?
-          @@instance.as(EmptyNode)
-        end
+        abstract def to_rlp : Bytes
       end
 
       class ExtNode < TrieNode
