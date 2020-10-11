@@ -44,7 +44,7 @@ module Fremkit
 
       class TrieNode
         def hash : Bytes
-          Digest::Keccak3.new(256)
+          digest = Digest::Keccak3.new(256)
           digest.update(self.to_rlp).digest
         end
       end
