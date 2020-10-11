@@ -23,6 +23,8 @@
 #
 # For more information, please refer to <http://unlicense.org>
 
+require "sha3"
+
 module Fremkit
   module Trees
     # A generic (key, value) store in which items are stored in a Merkle tree
