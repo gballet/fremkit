@@ -122,7 +122,7 @@ end
 
 struct Tuple(*T)
   def to_rlp : Bytes
-    encoding = alloc_with_header
+    encoding = Fremkit::Utils::RLP.alloc_with_header
     self.each do |item|
       encoding.write item.to_rlp
     end
@@ -133,7 +133,7 @@ end
 
 class Hash(K, V)
   def to_rlp : Bytes
-    encoding = alloc_with_header
+    encoding = Fremkit::Utils::RLP.alloc_with_header
     self.each do |k, v|
       encoding.write k.to_rlp
       encoding.write v.to_rlp
@@ -148,7 +148,7 @@ end
 
 struct Struct
   def to_rlp : Bytes
-    encoding = alloc_with_header
+    encoding = Fremkit::Utils::RLP.alloc_with_header
     puts {{@type.name}}
     {% for var in @type.class_vars %}
 	    encoding.write @@{{var.name}}.to_rlp
@@ -207,7 +207,7 @@ module Fremkit::Utils::RLP
     end
   end
 
-  def alloc_with_header : IO::Memory
+  def self.alloc_with_header : IO::Memory
     encoding = IO::Memory.new(4096)
     encoding.write_byte(0) # placeholders for the header, 64K-3 max
     encoding.write_byte(0)
