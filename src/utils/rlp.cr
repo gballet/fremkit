@@ -127,7 +127,7 @@ struct Tuple(*T)
       encoding.write item.to_rlp
     end
     payload_size = encoding.pos - 3
-    write_header(encoding.to_slice, payload_size.to_u32)
+    Fremkit::Utils::RLP.write_header(encoding.to_slice, payload_size.to_u32)
   end
 end
 
@@ -139,7 +139,7 @@ class Hash(K, V)
       encoding.write v.to_rlp
     end
     payload_size = encoding.pos - 3
-    write_header(encoding.to_slice, payload_size.to_u32)
+    Fremkit::Utils::RLP.write_header(encoding.to_slice, payload_size.to_u32)
   end
 
   def from_rlp(bytes : Bytes) : Typle(self, UInt32)
@@ -159,7 +159,7 @@ struct Struct
     {% end %}
     payload_size = encoding.pos - 3
     puts encoding
-    write_header(encoding.to_slice, payload_size.to_u32)
+    Fremkit::Utils::RLP.write_header(encoding.to_slice, payload_size.to_u32)
   end
 
   def Struct.from_rlp(rlp : Bytes) : {self, UInt32}
@@ -215,7 +215,7 @@ module Fremkit::Utils::RLP
     encoding
   end
 
-  def write_header(payload : Bytes, payload_size : UInt32)
+  def self.write_header(payload : Bytes, payload_size : UInt32)
     if payload_size < 56
       payload[2] = 192u8 + payload_size.to_u8
       return payload[2..]
@@ -248,7 +248,7 @@ module Fremkit::Utils::RLP
 
   # General version: serialize all items one by one. This won't support
   # payloads more than 64K in total.
-  def encode(items : Array) : Bytes
+  def self.encode(items : Array) : Bytes
     # For the initial capacity, assume that most items will be a multiple
     # of 32 so including the header and the encoding, assume it is going
     # to be 3 + 33 * items.size as a rule of thumb. And then round it up
@@ -281,7 +281,7 @@ module Fremkit::Utils::RLP
   end
 
   # Specialize template for bytes
-  def encode(bytes : Bytes) : Bytes
+  def self.encode(bytes : Bytes) : Bytes
     case
     when bytes.size == 0                     then bytes
     when bytes.size == 1 && bytes[0] < 128u8 then bytes
