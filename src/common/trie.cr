@@ -97,7 +97,7 @@ module Fremkit
 
         @children_and_value : StaticArray(TrieNode | Bytes, 17) = StaticArray[EmptyNode.get.as(TrieNode).as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), Bytes.empty]
 
-        def [](idx : Uint8) : TrieNode | Bytes
+        def [](idx : UInt8) : TrieNode | Bytes
           raise BranchNodeIndexException.new("getting index > 16 in branch node") if idx > 16
           @children_and_value[idx]
         end
