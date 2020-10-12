@@ -65,6 +65,11 @@ module Fremkit
         abstract def to_rlp : Bytes
       end
 
+      class EmptyNode < TrieNode
+        def to_rlp : Bytes
+          Bytes[0x80]
+        end
+      end
       class ExtNode < TrieNode
         getter prefix
         getter child
