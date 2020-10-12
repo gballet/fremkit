@@ -47,7 +47,7 @@ module Fremkit
       abstract class TrieNode
         def hash : Bytes
           digest = Digest::Keccak3.new(256)
-          digest.update(self.to_rlp).digest
+          digest.update(self.to_rlp).result
         end
 
         def hex_prefix(key : Bytes, leaf?) : Bytes
