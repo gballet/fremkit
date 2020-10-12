@@ -57,7 +57,7 @@ module Fremkit
           ret[0] |= 32 if leaf?
           key.each.with_index(key.size.odd? ? 1 : 0) do |x, idx|
             off = 1 + ((idx - (key.size.odd? ? 1 : 0))/2).to_u32
-            ret[off] |= (idx.odd? ^ key.size.odd?) ? key[idx] << 4 : key[idx]
+            ret[off] |= (idx.odd? ^ key.size.odd?) ? key[idx] : key[idx] << 4
           end
           ret
         end

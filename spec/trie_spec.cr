@@ -28,7 +28,15 @@ require "./spec_helper.cr"
 include Fremkit::Trees
 
 describe "hexary trie" do
+describe "hexary trie:" do
   it "should hash the empty node to the empty root" do
     Trie::EmptyNode.new.hash.should eq Trie::EmptyRoot
   end
+  describe "hex prefix:" do
+    it "should pack an even-length key" do
+      key = Bytes[0, 1, 2, 3]
+      Trie::EmptyNode.new.hex_prefix(key, true).should eq Bytes[32, 1, 35]
+    end
+  end
+
 end
