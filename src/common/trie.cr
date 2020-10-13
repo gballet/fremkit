@@ -130,6 +130,10 @@ module Fremkit
             raise BranchNodeIndexException.new("setting index idx > 16 in branch node")
           end
         end
+
+        def to_rlp : Bytes
+          @children_and_value.to_rlp
+        end
       end
 
       root : TrieNode
