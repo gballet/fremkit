@@ -120,15 +120,10 @@ module Fremkit
         end
 
         def []=(idx : UInt8, child : TrieNode | Bytes)
-          case idx
-          when 0..15
-            @children_and_value[idx] = child.as(TrieNode)
-          when 16
-            # Only idx=16 has is of type `Bytes`
-            @children_and_value[idx] = child.as(Bytes)
-          else
-            raise BranchNodeIndexException.new("setting index idx > 16 in branch node")
-          end
+          raise BranchNodeIndexException.new("setting index idx > 16 in branch node") if idx > 16
+          raise BranchNodeIndexException.new("index 16 contains a value, not a child node") if idx == 16 && !child.is_a?(Bytes)
+          raise BranchNodeIndexException.new("index 16 contains a value, not a child node") if idx < 16 && !child.is_a?(TrieNode)
+          @children_and_value[idx] = child
         end
 
         def to_rlp : Bytes
