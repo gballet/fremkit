@@ -119,6 +119,15 @@ class Array(T)
     Fremkit::Utils::RLP.write_header(encoding.to_slice, payload_size.to_u32)
   end
 end
+
+struct StaticArray(T, N)
+  def to_rlp : Bytes
+    encoding = Fremkit::Utils::RLP.alloc_with_header
+    self.each do |item|
+      encoding.write item.to_rlp
+    end
+    payload_size = encoding.pos - 3
+    Fremkit::Utils::RLP.write_header(encoding.to_slice, payload_size.to_u32)
   end
 end
 
