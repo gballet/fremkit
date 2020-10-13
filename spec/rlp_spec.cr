@@ -48,19 +48,19 @@ end
 
 describe "RLP tests" do
   it "should encode 1 as 1 byte" do
-    x = encode(Bytes[1])
+    x = Fremkit::Utils::RLP.encode(Bytes[1])
     x.size.should eq(1)
     x[0].should eq(1)
   end
 
   it "should encode 129 as 2 bytes" do
-    x = encode(Bytes[129])
+    x = Fremkit::Utils::RLP.encode(Bytes[129])
     x.size.should eq(2)
     x.should eq(Bytes[129, 129])
   end
 
   it "should encode a 55 bytes array as 56 bytes" do
-    x = encode(Bytes.new(55, 0))
+    x = Fremkit::Utils::RLP.encode(Bytes.new(55, 0))
     x.size.should eq(56)
     x.should eq(Bytes[183, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
   end
@@ -72,44 +72,44 @@ describe "RLP tests" do
 
   it "should be able to decode a byte that it has encoded" do
     i = Bytes[23]
-    r, size = decode(encode(i))
+    r, size = decode(Fremkit::Utils::RLP.encode(i))
     r.should eq(i)
     size.should eq 1
 
     i = Bytes[157]
-    r, size = decode(encode(i))
+    r, size = decode(Fremkit::Utils::RLP.encode(i))
     r.should eq(i)
     size.should eq 2
   end
 
   it "should be able to decode a byte array that it has encoded" do
     i = Bytes[23, 35, 12]
-    r, size = decode(encode(i))
+    r, size = decode(Fremkit::Utils::RLP.encode(i))
     r.should eq(i)
     size.should eq 4
   end
 
   it "should be able to decode a long byte array that it has encoded" do
     i = Random.new.random_bytes(59)
-    r, size = decode(encode(i))
+    r, size = decode(Fremkit::Utils::RLP.encode(i))
     r.should eq(i)
     size.should eq 61
   end
 
   it "should be able to encode and decode a byte array whose length is more than 1 byte wide" do
     i = Random.new.random_bytes(1024)
-    r, size = decode(encode(i))
+    r, size = decode(Fremkit::Utils::RLP.encode(i))
     r.should eq(i)
     size.should eq 1027
   end
 
   it "should be able to encode a complex structure smaller than 56 bytes" do
-    r = encode [Bytes[1, 1, 1], Bytes[2, 2, 2, 2]]
+    r = Fremkit::Utils::RLP.encode [Bytes[1, 1, 1], Bytes[2, 2, 2, 2]]
     r.should eq Bytes[201, 131, 1, 1, 1, 132, 2, 2, 2, 2]
   end
 
   it "should be able to encode a complex structure bigger than 56 bytes" do
-    r = encode [Bytes[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], Bytes[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]
+    r = Fremkit::Utils::RLP.encode [Bytes[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], Bytes[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]
     r.should eq Bytes[248, 58, 160, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 152, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
   end
 
