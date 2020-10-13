@@ -94,7 +94,25 @@ module Fremkit
         class BranchNodeIndexException < Exception
         end
 
-        @children_and_value : StaticArray(TrieNode | Bytes, 17) = StaticArray[EmptyNode.get.as(TrieNode).as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), EmptyNode.get.as(TrieNode), Bytes.empty]
+        @children_and_value : StaticArray(TrieNode | Bytes, 17) = StaticArray[
+          EmptyNode.new.as(TrieNode),
+          EmptyNode.new.as(TrieNode),
+          EmptyNode.new.as(TrieNode),
+          EmptyNode.new.as(TrieNode),
+          EmptyNode.new.as(TrieNode),
+          EmptyNode.new.as(TrieNode),
+          EmptyNode.new.as(TrieNode),
+          EmptyNode.new.as(TrieNode),
+          EmptyNode.new.as(TrieNode),
+          EmptyNode.new.as(TrieNode),
+          EmptyNode.new.as(TrieNode),
+          EmptyNode.new.as(TrieNode),
+          EmptyNode.new.as(TrieNode),
+          EmptyNode.new.as(TrieNode),
+          EmptyNode.new.as(TrieNode),
+          EmptyNode.new.as(TrieNode),
+          Bytes.empty,
+        ]
 
         def [](idx : UInt8) : TrieNode | Bytes
           raise BranchNodeIndexException.new("getting index > 16 in branch node") if idx > 16
