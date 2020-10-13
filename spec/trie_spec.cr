@@ -27,7 +27,6 @@ require "./spec_helper.cr"
 
 include Fremkit::Trees
 
-describe "hexary trie" do
 describe "hexary trie:" do
   it "should hash the empty node to the empty root" do
     Trie::EmptyNode.new.hash.should eq Trie::EmptyRoot
