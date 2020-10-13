@@ -157,6 +157,37 @@ class Hash(K, V)
   end
 end
 
+struct Slice(T)
+  def to_rlp : Bytes
+    # Specialization for byte slices
+    {% if @type.name == "Slice(UInt8)" %}
+      extra, header = case self.size
+                      when 1
+                        if self[0] < 128
+                          return self
+                        else
+                          {0, 129}
+                        end
+                      when 0...56
+                        {0, 128 + self.size}
+                      when 56...256
+                        {1, 129}
+                      when 256...65536
+                        {2, 130}
+                      else
+                        raise "RLP encoder doesn't support payloads more than 64K"
+                      end
+      rlp = Bytes.new(1 + extra + self.size)
+      self.size.times do |i|
+        rlp[1 + extra + i] = self[i]
+      end
+      rlp[0] = header.to_u8
+      rlp
+    {% else %}
+      Fremkit::Utils::RLP.encode(self)
+    {% end %}
+  end
+end
 
 abstract class Object
   def to_rlp : Bytes
