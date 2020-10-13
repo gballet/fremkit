@@ -139,7 +139,7 @@ module Fremkit
       root : TrieNode
 
       def initialize
-        @root = EmptyNode.get
+        @root = EmptyNode.new
       end
 
       def root_hash : Bytes
