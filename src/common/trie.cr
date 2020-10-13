@@ -62,7 +62,6 @@ module Fremkit
           ret
         end
 
-        abstract def to_rlp : Bytes
       end
 
       class EmptyNode < TrieNode

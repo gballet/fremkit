@@ -146,7 +146,8 @@ class Hash(K, V)
   end
 end
 
-struct Struct
+
+abstract class Object
   def to_rlp : Bytes
     encoding = Fremkit::Utils::RLP.alloc_with_header
     puts {{@type.name}}
@@ -162,7 +163,7 @@ struct Struct
     Fremkit::Utils::RLP.write_header(encoding.to_slice, payload_size.to_u32)
   end
 
-  def Struct.from_rlp(rlp : Bytes) : {self, UInt32}
+  def self.from_rlp(rlp : Bytes) : {self, UInt32}
     {{@type.name}}.allocate.from_rlp(rlp)
   end
 
