@@ -53,11 +53,11 @@ module Fremkit
         def hex_prefix(key : Bytes, leaf?) : Bytes
           length = (key.size / 2).to_i
           ret = Bytes.new(length + 1)
-          ret[0] = 16u8 | key[0] if key.size.odd?
-          ret[0] |= 32 if leaf?
-          key.each.with_index(key.size.odd? ? 1 : 0) do |x, idx|
-            off = 1 + ((idx - (key.size.odd? ? 1 : 0))/2).to_u32
-            ret[off] |= (idx.odd? ^ key.size.odd?) ? key[idx] : key[idx] << 4
+          ret[0] = (leaf? ? 32u8 : 0u8) + (key.size.odd? ? 16u8 : 0u8)
+          off = key.size.even? ? 1 : 0
+          key.each.with_index do |x, idx|
+            byte = off + ((1 - off + idx)/2).to_i
+            ret[byte] |= (idx.odd? ^ key.size.odd?) ? key[idx] : key[idx] << 4
           end
           ret
         end
