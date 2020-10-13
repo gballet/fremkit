@@ -111,12 +111,14 @@ end
 
 class Array(T)
   def to_rlp : Bytes
-    encoding = alloc_with_header
+    encoding = Fremkit::Utils::RLP.alloc_with_header
     self.each do |item|
       encoding.write item.to_rlp
     end
     payload_size = encoding.pos - 3
-    write_header(encoding.to_slice, payload_size.to_u32)
+    Fremkit::Utils::RLP.write_header(encoding.to_slice, payload_size.to_u32)
+  end
+end
   end
 end
 
