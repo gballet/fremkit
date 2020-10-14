@@ -82,6 +82,9 @@ module Fremkit
       end
 
       class LeafNode < TrieNode
+        property prefix
+        property value
+
         def initialize(@prefix : Bytes, @value : Bytes)
         end
 
@@ -141,7 +144,47 @@ module Fremkit
         @root.hash
       end
 
+      def common_length(key : Bytes, prefix : Bytes) : UInt32
+        split = 0
+        prefix.each.with_index do |p, i|
+          if p != key[i]
+            return i.to_u32
+          end
+        end
+        return key.size.to_u32
+      end
+
       def insert(key : Bytes, value : Bytes)
+        it = @root
+        key_idx = 0 # nibble index into the key
+        parent = @root.as(TrieNode)
+        while true
+          case it
+          when LeafNode
+            if key[key_idx..] != it.prefix
+              # need to create a branch node
+              split = common_length key[key_idx..], it.prefix
+              nbranch = BranchNode.new
+              nbranch[key[key_idx + split]] = LeafNode.new(key[key_idx + split + 1..], value)
+              nbranch[it.prefix[split]] = LeafNode.new it.prefix[split + 1..], it.value
+
+              start_node = if split == key_idx
+                             nbranch
+                           else
+                             ExtNode.new key[key_idx...split], nbranch
+                           end
+              if parent == @root
+                @root = start_node
+              else
+                parent.as(BranchNode)[key[key_idx - 1]] = start_node
+              end
+              break
+            else
+              # Overwrite the current value
+              it.value = value
+              break
+            end
+        end
       end
 
       def get(key : Bytes) : Bytes
