@@ -184,6 +184,14 @@ module Fremkit
               it.value = value
               break
             end
+          when EmptyNode
+            if parent == @root
+              @root = LeafNode.new key, value
+            else
+              parent.as(BranchNode)[key[key_idx]] = LeafNode.new key[key_idx + 1..], value
+            end
+            break
+          end
         end
       end
 
