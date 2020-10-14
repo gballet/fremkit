@@ -32,10 +32,32 @@ describe "hexary trie:" do
     Trie::EmptyNode.new.hash.should eq Trie::EmptyRoot
   end
   describe "hex prefix:" do
+    it "should pack an empty key" do
+      key = Bytes.empty
+      Trie::EmptyNode.new.hex_prefix(key, true).should eq Bytes[32]
+    end
+
+    it "should pack a single-nibble key" do
+      key = Bytes[1]
+      Trie::EmptyNode.new.hex_prefix(key, true).should eq Bytes[49]
+    end
+
+    it "should pack a single byte key" do
+      key = Bytes[0, 1]
+      Trie::EmptyNode.new.hex_prefix(key, true).should eq Bytes[32, 1]
+    end
+
     it "should pack an even-length key" do
       key = Bytes[0, 1, 2, 3]
       Trie::EmptyNode.new.hex_prefix(key, true).should eq Bytes[32, 1, 35]
     end
+
+    it "should pack an odd-sized key" do
+      key = Bytes[0, 1, 2]
+      Trie::EmptyNode.new.hex_prefix(key, true).should eq Bytes[48, 18]
+    end
+  end
+
   it "should be able to insert a (key,value) pair into the empty root" do
     trie = Trie.new
     trie.root_hash.should eq Trie::EmptyRoot
