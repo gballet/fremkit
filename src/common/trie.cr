@@ -160,6 +160,14 @@ module Fremkit
         parent = @root.as(TrieNode)
         while true
           case it
+          when BranchNode
+            parent = it
+            if it[key[key_idx]].is_a?(EmptyNode)
+              it[key[key_idx]] = LeafNode.new key[key_idx + 1..], value
+              break
+            end
+            it = it[key[key_idx]]
+            key_idx += 1
           when ExtNode
             split = common_length key[key_idx..], it.prefix
             if split < it.prefix.size
