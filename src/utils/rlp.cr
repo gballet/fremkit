@@ -129,6 +129,17 @@ struct StaticArray(T, N)
     payload_size = encoding.pos - 3
     Fremkit::Utils::RLP.write_header(encoding.to_slice, payload_size.to_u32)
   end
+
+  def to_rlp_compact : Bytes
+    encoding = Fremkit::Utils::RLP.alloc_with_header
+    self.each do |item|
+      rlp = item.to_rlp
+      rlp = Digest::Keccak3.new(256).update(rlp).result.to_rlp if rlp.size >= 32
+      encoding.write rlp
+    end
+    payload_size = encoding.pos - 3
+    Fremkit::Utils::RLP.write_header(encoding.to_slice, payload_size.to_u32)
+  end
 end
 
 struct Tuple(*T)
@@ -136,6 +147,17 @@ struct Tuple(*T)
     encoding = Fremkit::Utils::RLP.alloc_with_header
     self.each do |item|
       encoding.write item.to_rlp
+    end
+    payload_size = encoding.pos - 3
+    Fremkit::Utils::RLP.write_header(encoding.to_slice, payload_size.to_u32)
+  end
+
+  def to_compact_rlp : Bytes
+    encoding = Fremkit::Utils::RLP.alloc_with_header
+    self.each do |item|
+      rlp = item.to_rlp
+      rlp = Digest::Keccak3.new(256).update(rlp).result.to_rlp if rlp.size >= 32
+      encoding.write rlp
     end
     payload_size = encoding.pos - 3
     Fremkit::Utils::RLP.write_header(encoding.to_slice, payload_size.to_u32)
