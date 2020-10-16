@@ -75,4 +75,35 @@ describe "hexary trie:" do
     trie.insert Bytes[0, 1, 3, 3], Bytes[8, 9, 10, 11]
     trie.root_hash.should eq Bytes[186, 193, 14, 228, 135, 231, 231, 163, 129, 218, 34, 128, 99, 36, 34, 250, 51, 145, 99, 121, 10, 223, 66, 220, 84, 254, 118, 75, 125, 176, 199, 170]
   end
+
+  it "should be able to insert a (key,value) pair into a branch node" do
+    trie = Trie.new
+    trie.root_hash.should eq Trie::EmptyRoot
+
+    trie.insert Bytes[0, 1, 2, 3], Bytes[4, 5, 6, 7]
+    trie.insert Bytes[0, 1, 3, 3], Bytes[8, 9, 10, 11]
+    trie.insert Bytes[0, 1, 4, 3], Bytes[12, 13, 14, 15]
+    trie.root_hash.should eq Bytes[179, 6, 246, 23, 32, 206, 70, 231, 215, 201, 205, 171, 215, 1, 158, 156, 128, 176, 222, 139, 85, 92, 47, 0, 239, 212, 254, 44, 215, 100, 10, 88]
+  end
+
+  it "should be able to insert a (key,value) pair into an extension node" do
+    trie = Trie.new
+    trie.root_hash.should eq Trie::EmptyRoot
+
+    trie.insert Bytes[0, 1, 2, 3], Bytes[4, 5, 6, 7]
+    trie.insert Bytes[0, 1, 2, 4], Bytes[8, 9, 10, 11]
+    trie.insert Bytes[0, 3, 2, 3], Bytes[12, 13, 14, 15]
+    trie.root_hash.should eq Bytes[55, 132, 77, 17, 94, 83, 191, 139, 64, 102, 227, 73, 171, 71, 251, 189, 235, 168, 199, 15, 113, 214, 143, 66, 72, 195, 164, 207, 122, 191, 30, 220]
+  end
+
+  it "should properly encode an empty branch node" do
+    br = Trie::BranchNode.new
+    br.to_rlp.should eq Bytes[0xd1, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80]
+  end
+
+  it "should properly encode a branch node with only one leaf child" do
+    br = Trie::BranchNode.new
+    br[16] = Bytes[0, 1, 2, 3]
+    br.to_rlp.should eq Bytes[0xd5, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x84, 0, 1, 2, 3]
+  end
 end
