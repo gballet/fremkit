@@ -70,8 +70,8 @@ module Fremkit
         end
       end
       class ExtNode < TrieNode
-        getter prefix
-        getter child
+        property prefix
+        property child
 
         def initialize(@prefix : Bytes, @child : TrieNode)
         end
@@ -160,6 +160,28 @@ module Fremkit
         parent = @root.as(TrieNode)
         while true
           case it
+          when ExtNode
+            split = common_length key[key_idx..], it.prefix
+            if split < it.prefix.size
+              # need to create a branch node
+              nbranch = BranchNode.new
+              nbranch[key[key_idx + split]] = LeafNode.new(key[key_idx + split + 1..], value)
+              # Insert an intermediate ext node if the split occured before
+              # the last nibble.
+              nbranch[it.prefix[split]] = if split + 1 == it.prefix.size
+                                            it.child
+                                          else
+                                            ExtNode.new(it.prefix[key_idx + split + 1..], it.child)
+                                          end
+              it.child = nbranch
+              it.prefix = it.prefix[...split]
+              break
+            else
+              # recurse into child node
+              parent = it
+              key_idx += it.prefix.size
+              it = it.child
+            end
           when LeafNode
             if key[key_idx..] != it.prefix
               # need to create a branch node
