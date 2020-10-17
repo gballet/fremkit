@@ -68,6 +68,11 @@ module Fremkit
         def to_rlp : Bytes
           Bytes[0x80]
         end
+
+        def self.get : TrieNode
+          @@instance = EmptyNode.new.as(TrieNode) if @@instance.nil?
+          @@instance.as(TrieNode)
+        end
       end
 
       class ExtNode < TrieNode
@@ -99,22 +104,22 @@ module Fremkit
         end
 
         @children_and_value : StaticArray(TrieNode | Bytes, 17) = StaticArray[
-          EmptyNode.new.as(TrieNode),
-          EmptyNode.new.as(TrieNode),
-          EmptyNode.new.as(TrieNode),
-          EmptyNode.new.as(TrieNode),
-          EmptyNode.new.as(TrieNode),
-          EmptyNode.new.as(TrieNode),
-          EmptyNode.new.as(TrieNode),
-          EmptyNode.new.as(TrieNode),
-          EmptyNode.new.as(TrieNode),
-          EmptyNode.new.as(TrieNode),
-          EmptyNode.new.as(TrieNode),
-          EmptyNode.new.as(TrieNode),
-          EmptyNode.new.as(TrieNode),
-          EmptyNode.new.as(TrieNode),
-          EmptyNode.new.as(TrieNode),
-          EmptyNode.new.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
+          EmptyNode.get.as(TrieNode),
           Bytes.empty,
         ]
 
@@ -138,7 +143,7 @@ module Fremkit
       root : TrieNode
 
       def initialize
-        @root = EmptyNode.new
+        @root = EmptyNode.get
       end
 
       def root_hash : Bytes
