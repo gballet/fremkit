@@ -69,6 +69,7 @@ module Fremkit
           Bytes[0x80]
         end
       end
+
       class ExtNode < TrieNode
         property prefix
         property child

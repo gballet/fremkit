@@ -106,4 +106,13 @@ describe "hexary trie:" do
     br[16] = Bytes[0, 1, 2, 3]
     br.to_rlp.should eq Bytes[0xd5, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x84, 0, 1, 2, 3]
   end
+
+  it "should properly encode a leaf node with a sizeable value" do
+    trie = Trie.new
+    trie.root_hash.should eq Trie::EmptyRoot
+
+    trie.insert Bytes[0, 1, 2, 3], Bytes[4, 5, 6, 7]
+    trie.insert Bytes[0, 1, 3, 3], "a super, super, super, super, super, super long string".to_slice
+    trie.root_hash.should eq Bytes[253, 124, 160, 159, 36, 177, 175, 212, 15, 170, 231, 119, 145, 140, 148, 107, 120, 211, 141, 26, 11, 67, 19, 29, 153, 178, 210, 115, 166, 102, 67, 89]
+  end
 end
