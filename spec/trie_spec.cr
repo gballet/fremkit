@@ -61,7 +61,6 @@ describe "hexary trie:" do
 
   it "should be able to insert a (key,value) pair into the empty root" do
     trie = Trie.new
-    trie.root_hash.should eq Trie::EmptyRoot
 
     trie.insert Bytes[0, 1, 2, 3], Bytes[4, 5, 6, 7]
     trie.get?(Bytes[0, 1, 2, 3]).should eq Bytes[4, 5, 6, 7]
@@ -70,7 +69,6 @@ describe "hexary trie:" do
 
   it "should be able to insert a (key,value) pair into a leaf root" do
     trie = Trie.new
-    trie.root_hash.should eq Trie::EmptyRoot
 
     trie.insert Bytes[0, 1, 2, 3], Bytes[4, 5, 6, 7]
     trie.insert Bytes[0, 1, 3, 3], Bytes[8, 9, 10, 11]
@@ -79,7 +77,6 @@ describe "hexary trie:" do
 
   it "should be able to insert a (key,value) pair into a branch node" do
     trie = Trie.new
-    trie.root_hash.should eq Trie::EmptyRoot
 
     trie.insert Bytes[0, 1, 2, 3], Bytes[4, 5, 6, 7]
     trie.insert Bytes[0, 1, 3, 3], Bytes[8, 9, 10, 11]
@@ -89,7 +86,6 @@ describe "hexary trie:" do
 
   it "should be able to insert a (key,value) pair into an extension node" do
     trie = Trie.new
-    trie.root_hash.should eq Trie::EmptyRoot
 
     trie.insert Bytes[0, 1, 2, 3], Bytes[4, 5, 6, 7]
     trie.insert Bytes[0, 1, 2, 4], Bytes[8, 9, 10, 11]
@@ -110,7 +106,6 @@ describe "hexary trie:" do
 
   it "should properly encode a leaf node with a sizeable value" do
     trie = Trie.new
-    trie.root_hash.should eq Trie::EmptyRoot
 
     trie.insert Bytes[0, 1, 2, 3], Bytes[4, 5, 6, 7]
     trie.insert Bytes[0, 1, 3, 3], "a super, super, super, super, super, super long string".to_slice
