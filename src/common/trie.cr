@@ -31,7 +31,8 @@ module Fremkit
     abstract class MerkleTree(K, V, H)
       abstract def root_hash : H
       abstract def insert(key : K, value : V)
-      abstract def get(key : K) : V
+      abstract def get?(key : K) : V | Nil
+      abstract def get!(key : K) : V
     end
 
     # Implements a hexary Merkle Patricia Tree (MPT), which is not backed
@@ -231,7 +232,21 @@ module Fremkit
         end
       end
 
-      def get(key : Bytes) : Bytes
+      def get?(key : Bytes) : Bytes | Nil
+        it = @root
+        key_idx = 0 # nibble index into the key
+        while true
+          case it
+          when EmptyNode
+            return nil
+          end
+        end
+      end
+
+      def get!(key : Bytes) : Bytes
+        out = get(key)
+        raise "value #{key} not present in the trie" if out.nil?
+        out.as(Bytes)
       end
     end
   end

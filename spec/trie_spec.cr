@@ -64,7 +64,7 @@ describe "hexary trie:" do
     trie.root_hash.should eq Trie::EmptyRoot
 
     trie.insert Bytes[0, 1, 2, 3], Bytes[4, 5, 6, 7]
-    trie.get(Bytes[0, 1, 2, 3]).should eq Bytes[4, 5, 6, 7]
+    trie.get?(Bytes[0, 1, 2, 3]).should eq Bytes[4, 5, 6, 7]
     trie.root_hash.should eq Bytes[210, 173, 155, 246, 191, 47, 142, 155, 159, 177, 26, 9, 92, 220, 46, 254, 182, 70, 215, 123, 170, 170, 69, 47, 203, 11, 122, 110, 126, 103, 233, 158]
   end
 
@@ -115,5 +115,10 @@ describe "hexary trie:" do
     trie.insert Bytes[0, 1, 2, 3], Bytes[4, 5, 6, 7]
     trie.insert Bytes[0, 1, 3, 3], "a super, super, super, super, super, super long string".to_slice
     trie.root_hash.should eq Bytes[253, 124, 160, 159, 36, 177, 175, 212, 15, 170, 231, 119, 145, 140, 148, 107, 120, 211, 141, 26, 11, 67, 19, 29, 153, 178, 210, 115, 166, 102, 67, 89]
+  end
+
+  it "should report a missing key when encountering in an empty trie" do
+    trie = Trie.new
+    trie.get?(Bytes[0, 1, 2, 3]).should eq nil
   end
 end
