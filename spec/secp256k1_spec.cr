@@ -23,27 +23,18 @@
 #
 # For more information, please refer to <http://unlicense.org>
 
-@[Link("secp256k1")]
-lib Secp256k1
-  FLAGS_TYPE_MASK              = ((1 << 8) - 1)
-  FLAGS_TYPE_CONTEXT           = (1 << 0)
-  FLAGS_TYPE_COMPRESSION       = (1 << 1)
-  FLAGS_BIT_CONTEXT_VERIFY     = (1 << 8)
-  FLAGS_BIT_CONTEXT_SIGN       = (1 << 9)
-  FLAGS_BIT_CONTEXT_DECLASSIFY = (1 << 10)
-  CONTEXT_VERIFY               = (FLAGS_TYPE_CONTEXT | FLAGS_BIT_CONTEXT_VERIFY)
-  CONTEXT_SIGN                 = (FLAGS_TYPE_CONTEXT | FLAGS_BIT_CONTEXT_SIGN)
-  CONTEXT_DECLASSIFY           = (FLAGS_TYPE_CONTEXT | FLAGS_BIT_CONTEXT_DECLASSIFY)
-  CONTEXT_NONE                 = (FLAGS_TYPE_CONTEXT)
+require "./spec_helper"
 
-  alias Context = UInt8
-  alias PubKey = StaticArray(UInt8, 64)
-  alias SecKey = StaticArray(UInt8, 32)
-  alias Signature = StaticArray(UInt8, 64)
+describe "libsecp256k1" do
+  it "signs and verifies a public key" do
+    skey : StaticArray(UInt8, 32) = StaticArray[1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8]
+    ctx = Secp256k1.secp256k1_context_create(Secp256k1::CONTEXT_SIGN | Secp256k1::CONTEXT_VERIFY)
+    Secp256k1.secp256k1_ec_pubkey_create(ctx, out pubkey, pointerof(skey)).should eq 1
 
-  fun secp256k1_context_create(flags : UInt32) : Context*
-  fun secp256k1_ec_pubkey_create(ctx : Context*, pubkey : PubKey*, seckey : SecKey*) : UInt32
-  fun secp256k1_ecdsa_sign(ctx : Context*, sig : Signature*, msg : UInt8*, seckey : SecKey*, nonce_fct : -> UInt32, ndata : UInt8*) : UInt32
-  fun secp256k1_ecdsa_verify(ctx : Context*, sig : Signature*, msg : UInt8*, pubkey : PubKey*) : UInt32
-end
+    msg = Bytes.new(32, 1)
+    puts msg
+    sig = StaticArray(UInt8, 64).new(64)
+    Secp256k1.secp256k1_ecdsa_sign(ctx, pointerof(sig), msg, pointerof(skey), nil, nil).should eq 1
+    Secp256k1.secp256k1_ecdsa_verify(ctx, pointerof(sig), msg, pointerof(pubkey)).should eq 1
+  end
 end
