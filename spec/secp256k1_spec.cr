@@ -27,7 +27,8 @@ require "./spec_helper"
 
 describe "libsecp256k1" do
   it "signs and verifies a public key" do
-    skey : StaticArray(UInt8, 32) = StaticArray[1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8]
+    skey = StaticArray(UInt8, 32).new { Random.new.rand(255).to_u8 }
+    [1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8]
     ctx = Secp256k1.secp256k1_context_create(Secp256k1::CONTEXT_SIGN | Secp256k1::CONTEXT_VERIFY)
     Secp256k1.secp256k1_ec_pubkey_create(ctx, out pubkey, pointerof(skey)).should eq 1
 
