@@ -39,3 +39,9 @@ describe "libsecp256k1" do
     Secp256k1.secp256k1_ecdsa_verify(ctx, pointerof(sig), msg, pointerof(pubkey)).should eq 1
   end
 end
+
+describe "curve" do
+  it "generator is on_curve?" do
+    S256.on_curve?(S256.generator)
+  end
+end

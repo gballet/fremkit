@@ -23,6 +23,8 @@
 #
 # For more information, please refer to <http://unlicense.org>
 
+require "big"
+
 @[Link("secp256k1")]
 lib Secp256k1
   FLAGS_TYPE_MASK              = ((1 << 8) - 1)
@@ -46,4 +48,42 @@ lib Secp256k1
   fun secp256k1_ecdsa_sign(ctx : Context*, sig : Signature*, msg : UInt8*, seckey : SecKey*, nonce_fct : -> UInt32, ndata : UInt8*) : UInt32
   fun secp256k1_ecdsa_verify(ctx : Context*, sig : Signature*, msg : UInt8*, pubkey : PubKey*) : UInt32
 end
+
+class Curve(N)
+  struct Point
+    def initialize(@x : BigInt, @y : BigInt)
+    end
+
+    getter :x, :y
+
+    def +(other : Point) : Point
+      (self.jacobian + other.jacobian).to_affine
+    end
+  end
+
+  def initialize(@p : BigInt, @n : BigInt, @b : BigInt, @g : Point)
+  end
+
+  def generator : Point
+    @g
+  end
+
+  def on_curve?(p : Point) : Bool
+    # y² = x³ - 3x + b
+    left = @g.y**2 % @p
+    right = (@g.x**3 - 3*@g.x + @b) % @p
+
+    return left == right
+  end
+end
+
+S256 = Curve(256).new(
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F".to_big_i(16),
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141".to_big_i(16),
+  "0000000000000000000000000000000000000000000000000000000000000007".to_big_i(16),
+  Curve::Point.new(
+    "79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798".to_big_i(16),
+    "483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8".to_big_i(16)
+  )
+)
 end

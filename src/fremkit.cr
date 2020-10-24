@@ -23,6 +23,7 @@
 #
 # For more information, please refer to <http://unlicense.org>
 
+require "./lib/secp256k1"
 require "./common/address"
 require "./utils/rlp"
 require "./core/block"
