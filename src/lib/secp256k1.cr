@@ -64,14 +64,16 @@ class Curve(N)
   def initialize(@p : BigInt, @n : BigInt, @b : BigInt, @g : Point)
   end
 
+  getter :p
+
   def generator : Point
     @g
   end
 
   def on_curve?(p : Point) : Bool
-    # y² = x³ - 3x + b
-    left = @g.y**2 % @p
-    right = (@g.x**3 - 3*@g.x + @b) % @p
+    # y² = x³ + b
+    left = p.y**2 % @p
+    right = (p.x**3 + @b) % @p
 
     return left == right
   end
