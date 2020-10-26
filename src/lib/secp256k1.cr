@@ -53,6 +53,18 @@ lib Secp256k1
   fun secp256k1_ecdsa_recover(ctx : Context*, pubkey : PubKey*, sig : RecoverableSignature*, msg : UInt8*) : UInt32
 end
 
+# Temporary fix until the merge of:
+# * [ ] https://github.com/crystal-lang/crystal/pull/9847
+# * [ ] https://github.com/crystal-lang/crystal/pull/9848
+@[Link("gmp")]
+lib TempGMP
+  fun mod_inv = __gmpz_invert(rop : LibGMP::MPZ*, op1 : LibGMP::MPZ*, op2 : LibGMP::MPZ*)
+end
+
+def mod_inv(g : BigInt, n : BigInt) : BigInt
+  BigInt.new { |mpz| TempGMP.mod_inv(mpz, g.to_unsafe, n.to_unsafe) }
+end
+
 class Curve
   struct Point
     def initialize(@x : BigInt, @y : BigInt)
