@@ -53,7 +53,7 @@ lib Secp256k1
   fun secp256k1_ecdsa_recover(ctx : Context*, pubkey : PubKey*, sig : RecoverableSignature*, msg : UInt8*) : UInt32
 end
 
-class Curve(N)
+class Curve
   struct Point
     def initialize(@x : BigInt, @y : BigInt)
     end
@@ -83,7 +83,7 @@ class Curve(N)
   end
 end
 
-S256 = Curve(256).new(
+S256 = Curve.new(
   "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F".to_big_i(16),
   "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141".to_big_i(16),
   "0000000000000000000000000000000000000000000000000000000000000007".to_big_i(16),
