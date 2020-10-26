@@ -42,11 +42,15 @@ lib Secp256k1
   alias PubKey = StaticArray(UInt8, 64)
   alias SecKey = StaticArray(UInt8, 32)
   alias Signature = StaticArray(UInt8, 64)
+  alias RecoverableSignature = StaticArray(UInt8, 65)
+  alias Point = StaticArray(UInt8, 64)
 
   fun secp256k1_context_create(flags : UInt32) : Context*
   fun secp256k1_ec_pubkey_create(ctx : Context*, pubkey : PubKey*, seckey : SecKey*) : UInt32
   fun secp256k1_ecdsa_sign(ctx : Context*, sig : Signature*, msg : UInt8*, seckey : SecKey*, nonce_fct : -> UInt32, ndata : UInt8*) : UInt32
+  fun secp256k1_ecdsa_sign_recoverable(ctx : Context*, sig : RecoverableSignature*, msg : UInt8*, seckey : SecKey*, nonce_fct : -> UInt32, ndata : UInt8*) : UInt32
   fun secp256k1_ecdsa_verify(ctx : Context*, sig : Signature*, msg : UInt8*, pubkey : PubKey*) : UInt32
+  fun secp256k1_ecdsa_recover(ctx : Context*, pubkey : PubKey*, sig : RecoverableSignature*, msg : UInt8*) : UInt32
 end
 
 class Curve(N)
