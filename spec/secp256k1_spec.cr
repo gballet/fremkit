@@ -58,6 +58,10 @@ end
 
 describe "curve" do
   it "generator is on_curve?" do
-    S256.on_curve?(S256.generator)
+    S256.on_curve?(S256.generator).should eq true
+  end
+
+  it ": on_curve reject off-curve point" do
+    S256.on_curve?(Curve::Point.new(1.to_big_i, 1.to_big_i)).should eq false
   end
 end
