@@ -25,7 +25,23 @@
 
 require "./spec_helper"
 
+def str_to_skey(str : String) : StaticArray(UInt8, 32)
+  skey : StaticArray(UInt8, 32) = StaticArray(UInt8, 32).new(0)
+  str.hexbytes.each_with_index do |b, i|
+    skey[i] = b
+  end
+  skey
+end
+
 describe "libsecp256k1" do
+  it "generates a public key" do
+    skey = str_to_skey "b1709928c134598d8718829738e8e954a906afdbc065abe6049cb66970070ee8"
+    ctx = Secp256k1.secp256k1_context_create(Secp256k1::CONTEXT_SIGN | Secp256k1::CONTEXT_VERIFY)
+
+    Secp256k1.secp256k1_ec_pubkey_create(ctx, out pubkey, pointerof(skey)).should eq 1
+    pubkey.to_slice[0..31].should eq "c4ccc37f7b6b92cec5038ddca99e8f8871bd1a5d1a3ccb27b84cf2b72ee8ba55".hexbytes.reverse!
+  end
+
   it "signs and verifies a public key" do
     skey = StaticArray(UInt8, 32).new { Random.new.rand(255).to_u8 }
     [1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8, 1u8]
