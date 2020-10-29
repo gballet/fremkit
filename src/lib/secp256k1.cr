@@ -104,4 +104,38 @@ S256 = Curve.new(
     "483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8".to_big_i(16)
   )
 )
+
+class KeyPair
+  def self.generate : Self
+    newkey = Self.new(skey)
+    Secp256k1.secp256k1_ec_pubkey_create(@ctx, out pubkey, pointerof(skey))
+    newkey.pubkey = pubkey
+  end
+
+  def self.from_string(str : String) : Self
+    skey : StaticArray(UInt8, 32) = StaticArray(UInt8, 32).new(0)
+    str.hexbytes.each_with_index do |b, i|
+      skey[i] = b
+    end
+    skey
+  end
+
+  def initialize(@skey : StaticArray(UInt8, 32))
+    @ctx = Secp256k1.secp256k1_context_create(Secp256k1::CONTEXT_SIGN | Secp256k1::CONTEXT_VERIFY)
+  end
+
+  def x : BigInt
+  end
+
+  def y : BigInt
+  end
+
+  def recover
+  end
+
+  def sign(msg : Bytes)
+  end
+
+  def verify(msg : Bytes, sig : Bytes)
+  end
 end
