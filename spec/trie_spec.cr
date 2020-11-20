@@ -112,8 +112,35 @@ describe "hexary trie:" do
     trie.root_hash.should eq Bytes[253, 124, 160, 159, 36, 177, 175, 212, 15, 170, 231, 119, 145, 140, 148, 107, 120, 211, 141, 26, 11, 67, 19, 29, 153, 178, 210, 115, 166, 102, 67, 89]
   end
 
+  it "should be able to read back a leaf value" do
+    trie = Trie.new
+    trie.insert Bytes[0, 1, 2, 3], Bytes[4, 5, 6, 7]
+    trie.get?(Bytes[0, 1, 2, 3]).should eq Bytes[4, 5, 6, 7]
+  end
+
   it "should report a missing key when encountering in an empty trie" do
     trie = Trie.new
     trie.get?(Bytes[0, 1, 2, 3]).should eq nil
+  end
+
+  it "should report a missing key when encountering an empty node in a branch" do
+    trie = Trie.new
+    trie.insert Bytes[0, 1, 2, 3], Bytes[4, 5, 6, 7]
+    trie.insert Bytes[0, 1, 3, 3], Bytes[8, 9, 10, 11]
+    trie.get?(Bytes[0, 1, 4, 3]).should eq nil
+  end
+
+  it "should report a missing key when encountering a mismatch inside an ext node's key" do
+    trie = Trie.new
+    trie.insert Bytes[0, 1, 2, 3], Bytes[4, 5, 6, 7]
+    trie.insert Bytes[0, 1, 3, 3], Bytes[8, 9, 10, 11]
+    trie.get?(Bytes[0, 2, 4, 3]).should eq nil
+  end
+
+  it "should be able to read back a leaf value through branch and ext" do
+    trie = Trie.new
+    trie.insert Bytes[0, 1, 2, 3], Bytes[4, 5, 6, 7]
+    trie.insert Bytes[0, 1, 3, 3], Bytes[8, 9, 10, 11]
+    trie.get?(Bytes[0, 1, 2, 3]).should eq Bytes[4, 5, 6, 7]
   end
 end
