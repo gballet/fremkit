@@ -23,7 +23,7 @@
 #
 # For more information, please refer to <http://unlicense.org>
 
-@[Link(ldflags: "-Levmone/lib -levmone")]
+@[Link(ldflags: "-levmone")]
 lib LibEVMOne
   enum StatusCode
     Success
