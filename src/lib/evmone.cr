@@ -46,15 +46,71 @@ lib LibEVMOne
     OutOfMemory               = -3
   end
 
+  enum StorageStatus
+    StorageUnchanged
+    StorageModified
+    StorageModifiedAgain
+    StorageAdded
+    StorageDeleted
+  end
+
+  alias Address = UInt8[20]
+
   struct Result
     status_code : StatusCode
-    gas_left : UInt64
+    gas_left : Int64
     output_data : UInt8*
     output_size : LibC::SizeT
     release : -> Result*
-    create_address : UInt8[20]
+    create_address : Address
     padding : UInt8[4]
   end
 
-  alias Revision = UInt64
+  alias HostContext = Void
+
+  struct HostInterface
+    account_exist : (HostContext*, Address*) -> Bool
+    get_storage : (HostContext*, Address*, UInt8[32]*) -> UInt8[32]
+    set_storage : (HostContext*, Address*, UInt8[32]*, UInt8[32]*) -> StorageStatus
+    get_balance : (HostContext*, Address*) -> UInt8[32]
+    get_code_size : (HostContext*, Address*) -> LibC::SizeT
+    get_code_hash : (HostContext*, Address*) -> UInt8[32]*
+    copy_code : (HostContext*, Address*, LibC::SizeT, UInt8*, LibC::SizeT) -> LibC::SizeT
+    selfdestruct : (HostContext*, Address*, Address*) ->
+  end
+
+  enum CallKind
+    CALL
+    DELEGATECALL
+    CALLCODE
+    CREATE
+    CREATE2
+  end
+
+  enum Revision
+    FRONTIER
+    HOMESTEAD
+    TANGERINE_WHISTLE
+    SPURIOUS_DRAGON
+    BYZANTIUM
+    CONSTANTINOPLE
+    PETERSBURG
+    ISTANBUL
+    BERLIN
+  end
+
+  struct Message
+    kind : CallKind
+    flags : UInt32
+    depth : Int32
+    gas : Int64
+    destination : Address
+    sender : Address
+    input_data : UInt8*
+    input_size : LibC::SizeT
+    value : StaticArray(UInt8, 32)
+    create2_salt : StaticArray(UInt8, 32)
+  end
+
+  fun execute = "_ZN6evmone7executeEP7evmc_vmPK19evmc_host_interfaceP17evmc_host_context13evmc_revisionPK12evmc_messagePKhm"(Void*, HostInterface*, HostContext*, Revision, Message*, UInt8*, LibC::SizeT) : Result
 end
