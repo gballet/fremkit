@@ -56,8 +56,6 @@ abstract class Registers
 end
 
 abstract class VM
-  abstract def step
-  abstract def registers : Registers
   abstract def memory : Bytes
   abstract def run
 end
