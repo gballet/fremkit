@@ -28,6 +28,7 @@ require "big"
 require "./state"
 require "../common/address"
 require "sha3"
+require "../lib/evmone"
 
 class ExecutionContext
   property gas : UInt64 = 0
@@ -58,6 +59,27 @@ end
 abstract class VM
   abstract def memory : Bytes
   abstract def run
+end
+
+class EVMOne(T) < VM
+  def initialize(@code : Bytes, gas : Int64, @state : Fremkit::Core::State(BigInt, T))
+    @host_if = LibEVMOne::HostInterface.new(
+      account_exist: ->(ctx : LibEVMOne::HostContext*, addr : LibEVMOne::Address*) {
+        false
+      },
+    )
+
+    @msg = LibEVMOne::Message.new
+    @msg.gas = gas
+  end
+
+  def run
+    LibEVMOne.execute(nil, pointerof(@host_if), Box.box(@state), LibEVMOne::Revision::FRONTIER, pointerof(@msg), @code.to_unsafe, @code.size)
+  end
+
+  def memory : Bytes
+    @state.memory
+  end
 end
 
 class EVM(T) < VM

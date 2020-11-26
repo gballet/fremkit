@@ -77,6 +77,7 @@ lib LibEVMOne
     get_code_hash : (HostContext*, Address*) -> UInt8[32]*
     copy_code : (HostContext*, Address*, LibC::SizeT, UInt8*, LibC::SizeT) -> LibC::SizeT
     selfdestruct : (HostContext*, Address*, Address*) ->
+    call : (HostContext*, Address*, UInt8*, LibC::SizeT, UInt8[32]*, LibC::SizeT) ->
   end
 
   enum CallKind
