@@ -15,12 +15,12 @@ jobs: # a collection of jobs
           paths:
             - ./lib
       - run:
-          name: Install libraries
-          command: apt-update && apt-get install -y libsecp256k1-dev
-      - run:
-          name: Install cmake
+          name: Install tools
+          command: apt update && apt install -y libsecp256k1-dev cmake
+          #      - run:
+          #name: Install cmake
           #command: sed -i -- 's/VERSION 3.13/VERSION 3.5/g' CMakeLists.txt && apt update && apt search cmake && apt-get install -y cmake
-          command: curl https://github.com/Kitware/CMake/releases/download/v3.19.1/cmake-3.19.1-Linux-x86_64.sh && sh cmake-3.19.1-Linux-x86_64.sh
+          #command: apt install -y wget && wget https://github.com/Kitware/CMake/releases/download/v3.19.1/cmake-3.19.1-Linux-x86_64.sh && sh cmake-3.19.1-Linux-x86_64.sh --skip-license && ./cmake
       - run:
           name: Update submodules
           command: git submodule update --init
