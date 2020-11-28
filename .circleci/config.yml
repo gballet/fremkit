@@ -20,7 +20,7 @@ jobs: # a collection of jobs
       - run:
           name: Install cmake
           #command: sed -i -- 's/VERSION 3.13/VERSION 3.5/g' CMakeLists.txt && apt update && apt search cmake && apt-get install -y cmake
-          command: apt update && apt-get install -y cmake && cmake --version
+          command: curl https://github.com/Kitware/CMake/releases/download/v3.19.1/cmake-3.19.1-Linux-x86_64.sh && sh cmake-3.19.1-Linux-x86_64.sh
       - run:
           name: Update submodules
           command: git submodule update --init
