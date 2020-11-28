@@ -15,6 +15,9 @@ jobs: # a collection of jobs
           paths:
             - ./lib
       - run:
+          name: Install libraries
+          command: apt-update && apt-get install -y libsecp256k1-dev
+      - run:
           name: Install cmake
           #command: sed -i -- 's/VERSION 3.13/VERSION 3.5/g' CMakeLists.txt && apt update && apt search cmake && apt-get install -y cmake
           command: apt update && apt-get install -y cmake && cmake --version
