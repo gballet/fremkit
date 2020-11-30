@@ -1,10 +1,16 @@
-version: 2 # use CircleCI 2.0
+version: 2.1
 jobs: # a collection of jobs
   build: 
     docker: # run build steps with docker
       - image: crystallang/crystal:latest
     steps: # a collection of executable steps
       - checkout # checks out source code to working directory
+      - run:
+          name: Install tools
+          command: apt update -y && apt install -y libsecp256k1-dev wget
+      - run:
+          name: CMake setup 
+          command: wget https://github.com/Kitware/CMake/releases/download/v3.19.1/cmake-3.19.1-Linux-x86_64.sh && rm -rf cmake && mkdir cmake && sh cmake-3.19.1-Linux-x86_64.sh --skip-license --prefix=./cmake && ./cmake/bin/cmake --version
       - restore_cache: # Restore dependency cache
           key: dependency-cache-{{ checksum "shard.lock" }}
       - run:
@@ -15,14 +21,11 @@ jobs: # a collection of jobs
           paths:
             - ./lib
       - run:
-          name: Install tools
-          command: apt update && apt install -y libsecp256k1-dev cmake
-      - run:
           name: Update submodules
-          command: git submodule update --init
+          command: git submodule update --init --recursive
       - run:
           name: Build evmone
-          command: mkdir -p build/evmone && cd build/evmone && cmake ../../evmone && cmake --build . -- -j
+          command: mkdir -p build/evmone && cd build/evmone && ../../cmake/bin/cmake ../../evmone && ../../cmake/bin/cmake --build . -- -j
       - run:
           name: test
           command: crystal spec --error-trace
