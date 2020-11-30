@@ -17,16 +17,12 @@ jobs: # a collection of jobs
       - run:
           name: Install tools
           command: apt update && apt install -y libsecp256k1-dev cmake
-          #      - run:
-          #name: Install cmake
-          #command: sed -i -- 's/VERSION 3.13/VERSION 3.5/g' CMakeLists.txt && apt update && apt search cmake && apt-get install -y cmake
-          #command: apt install -y wget && wget https://github.com/Kitware/CMake/releases/download/v3.19.1/cmake-3.19.1-Linux-x86_64.sh && sh cmake-3.19.1-Linux-x86_64.sh --skip-license && ./cmake
       - run:
           name: Update submodules
           command: git submodule update --init
-      #- run:
-          #name: Build evmone
-          #command: mkdir -p build/evmone && cd build/evmone && cmake ../../evmone && cmake --build . -- -j
+      - run:
+          name: Build evmone
+          command: mkdir -p build/evmone && cd build/evmone && cmake ../../evmone && cmake --build . -- -j
       - run:
           name: test
           command: crystal spec --error-trace
