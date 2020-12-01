@@ -8,9 +8,15 @@ jobs: # a collection of jobs
       - run:
           name: Install tools
           command: apt update -y && apt install -y libsecp256k1-dev wget
+      - restore_cache:
+          key: cmake
       - run:
           name: CMake setup 
-          command: wget https://github.com/Kitware/CMake/releases/download/v3.19.1/cmake-3.19.1-Linux-x86_64.sh && rm -rf cmake && mkdir cmake && sh cmake-3.19.1-Linux-x86_64.sh --skip-license --prefix=./cmake && ./cmake/bin/cmake --version
+          command: if [ ! -x ./cmake/bin/cmake ]; then wget https://github.com/Kitware/CMake/releases/download/v3.19.1/cmake-3.19.1-Linux-x86_64.sh && rm -rf cmake && mkdir cmake && sh cmake-3.19.1-Linux-x86_64.sh --skip-license --prefix=./cmake && ./cmake/bin/cmake --version ; fi
+      - save_cache:
+          key: cmake
+          paths:
+            - ./cmake
       - restore_cache: # Restore dependency cache
           key: dependency-cache-{{ checksum "shard.lock" }}
       - run:
@@ -28,4 +34,4 @@ jobs: # a collection of jobs
           command: mkdir -p build/evmone && cd build/evmone && ../../cmake/bin/cmake ../../evmone && ../../cmake/bin/cmake --build . -- -j
       - run:
           name: test
-          command: find . -name "libevmone*" && pwd && CRYSTAL_LIBRARY_PATH=$PWD/build/evmone/lib LD_LIBRARY_PATH=build/evmone/lib crystal spec --error-trace
+          command: CRYSTAL_LIBRARY_PATH=$PWD/build/evmone/lib LD_LIBRARY_PATH=build/evmone/lib crystal spec --error-trace
