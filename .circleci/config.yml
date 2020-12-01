@@ -28,4 +28,4 @@ jobs: # a collection of jobs
           command: mkdir -p build/evmone && cd build/evmone && ../../cmake/bin/cmake ../../evmone && ../../cmake/bin/cmake --build . -- -j
       - run:
           name: test
-          command: crystal spec --error-trace
+          command: find . -name "libevmone*" && pwd && CRYSTAL_LIBRARY_PATH=$PWD/build/evmone/lib LD_LIBRARY_PATH=build/evmone/lib crystal spec --error-trace
