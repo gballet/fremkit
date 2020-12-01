@@ -29,12 +29,16 @@ require "./spec_helper.cr"
 require "../src/core/vm"
 
 struct TestDataAccount
-  JSON.mapping(
-    balance: {type: BigInt, converter: TestDataAccount::ParseBigInt},
-    code: {type: Bytes, converter: TestDataAccount::ParseBytes},
-    nonce: {type: BigInt, converter: TestDataAccount::ParseBigInt},
-    storage: {type: Hash(BigInt, BigInt), converter: TestDataAccount::ParseStorage},
-  )
+  include JSON::Serializable
+
+  @[JSON::Field(key: "balance", converter: TestDataAccount::ParseBigInt)]
+  property balance : BigInt
+  @[JSON::Field(key: "code", converter: TestDataAccount::ParseBytes)]
+  property code : Bytes
+  @[JSON::Field(key: "nonce", converter: TestDataAccount::ParseBigInt)]
+  property nonce : BigInt
+  @[JSON::Field(key: "storage", converter: TestDataAccount::ParseStorage)]
+  property storage : Hash(BigInt, BigInt)
 
   class ParseStorage
     def self.from_json(pull : JSON::PullParser)
