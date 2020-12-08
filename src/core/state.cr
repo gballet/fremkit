@@ -43,6 +43,8 @@ module Fremkit::Core
     def []=(address : A, value : T) : T
       set_word address, value
     end
+
+    abstract def has_address?(address : A) : Bool
   end
 
   # A simple state representation in which values are
@@ -59,6 +61,10 @@ module Fremkit::Core
 
     def set_word(address : BigInt, bytes : T)
       @state[address] = bytes
+    end
+
+    def has_address?(address : BigInt) : Bool
+      @state.has_key?(address)
     end
   end
 end

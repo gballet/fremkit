@@ -84,6 +84,7 @@ class EVMOne(T) < VM
           address += addr.value[i]
         end
 
+        raise "unknown account" unless the_state.has_address?(address)
         v = the_state[address].storage[slot]
         StaticArray(UInt8, 32).new do |i|
           ((v >> (8*(31 - i))) & 255).to_u8
@@ -115,6 +116,10 @@ class EVMOne(T) < VM
           return LibEVMOne::StorageStatus::StorageAdded
         end
         return LibEVMOne::StorageStatus::StorageUnchanged if the_state[address].storage[slot] == val && val != 0
+        if the_state[address].storage[slot] != 0 && value == 0
+          the_state[address].storage.delete slot
+          return LibEVMOne::StorageStatus::StorageDeleted
+        end
         the_state[address].storage[slot] = val
         LibEVMOne::StorageStatus::StorageModified
       },
