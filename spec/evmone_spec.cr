@@ -28,6 +28,8 @@ require "json"
 require "./spec_helper"
 require "../src/core/vm"
 
+VMTestDir = "tests/VMTests"
+
 struct TestDataAccount
   include JSON::Serializable
 
@@ -79,6 +81,41 @@ end
 
 NullAddress = LibEVMOne::Address.new(0)
 
+def exec_test(desc)
+  state = Fremkit::Core::MapState(TestDataAccount).new
+  pre = Hash(String, TestDataAccount).from_json desc["pre"].to_json
+  pre.each do |addr, account|
+    state[addr[2..].to_big_i(16)] = account
+  end
+
+  exec = desc["exec"]
+  code = exec["code"].to_s[2..].hexbytes
+  gas = exec["gas"].to_s[2..].to_big_i(16).to_i64
+  msg = LibEVMOne::Message.new(
+    kind: LibEVMOne::CallKind::CALL,
+    gas: gas,
+    destination: LibEVMOne::Address.new(20),
+    sender: LibEVMOne::Address.new(20),
+  )
+  accaddr = exec["address"].to_s[2..].hexbytes
+  sendaddr = exec["caller"].to_s[2..].hexbytes
+  20.times do |i|
+    msg.destination[i] = accaddr[i]
+    msg.sender[i] = sendaddr[i]
+  end
+
+  input = exec["data"].to_s[2..].hexbytes
+
+  evm = EVMOne.new msg.sender, msg.destination, code, gas, input, state
+  result = evm.run
+
+  post = Hash(String, TestDataAccount).from_json (desc["post"]? || Hash(Nil, Nil).new).to_json
+  post.each do |addr, account|
+    res_account = state[addr[2..].to_big_i(16)]
+    res_account.should eq account
+  end
+end
+
 describe "evmone lib" do
   it "runs a simple program" do
     # 2x PUSH1
@@ -115,38 +152,7 @@ describe "evmone lib" do
         desc = JSON.parse(File.read("#{dirname}/#{filename}"))
 
         it name do
-          state = Fremkit::Core::MapState(TestDataAccount).new
-          pre = Hash(String, TestDataAccount).from_json desc[name]["pre"].to_json
-          pre.each do |addr, account|
-            state[addr[2..].to_big_i(16)] = account
-          end
-
-          exec = desc[name]["exec"]
-          code = exec["code"].to_s[2..].hexbytes
-          gas = exec["gas"].to_s[2..].to_big_i(16).to_i64
-          msg = LibEVMOne::Message.new(
-            kind: LibEVMOne::CallKind::CALL,
-            gas: gas,
-            destination: LibEVMOne::Address.new(20),
-            sender: LibEVMOne::Address.new(20),
-          )
-          accaddr = exec["address"].to_s[2..].hexbytes
-          sendaddr = exec["caller"].to_s[2..].hexbytes
-          20.times do |i|
-            msg.destination[i] = accaddr[i]
-            msg.sender[i] = sendaddr[i]
-          end
-
-          input = exec["data"].to_s[2..].hexbytes
-
-          evm = EVMOne.new msg.sender, msg.destination, code, gas, input, state
-          result = evm.run
-
-          post = Hash(String, TestDataAccount).from_json (desc[name]["post"]? || Hash(Nil, Nil).new).to_json
-          post.each do |addr, account|
-            res_account = state[addr[2..].to_big_i(16)]
-            res_account.should eq account
-          end
+          exec_test desc[name]
         end
       }
     end
@@ -160,38 +166,7 @@ describe "evmone lib" do
         desc = JSON.parse(File.read("#{dirname}/#{filename}"))
 
         it name do
-          state = Fremkit::Core::MapState(TestDataAccount).new
-          pre = Hash(String, TestDataAccount).from_json desc[name]["pre"].to_json
-          pre.each do |addr, account|
-            state[addr[2..].to_big_i(16)] = account
-          end
-
-          exec = desc[name]["exec"]
-          code = exec["code"].to_s[2..].hexbytes
-          gas = exec["gas"].to_s[2..].to_big_i(16).to_i64
-          msg = LibEVMOne::Message.new(
-            kind: LibEVMOne::CallKind::CALL,
-            gas: gas,
-            destination: LibEVMOne::Address.new(20),
-            sender: LibEVMOne::Address.new(20),
-          )
-          accaddr = exec["address"].to_s[2..].hexbytes
-          sendaddr = exec["caller"].to_s[2..].hexbytes
-          20.times do |i|
-            msg.destination[i] = accaddr[i]
-            msg.sender[i] = sendaddr[i]
-          end
-
-          input = exec["data"].to_s[2..].hexbytes
-
-          evm = EVMOne.new msg.sender, msg.destination, code, gas, input, state
-          result = evm.run
-
-          post = Hash(String, TestDataAccount).from_json (desc[name]["post"]? || Hash(Nil, Nil).new).to_json
-          post.each do |addr, account|
-            res_account = state[addr[2..].to_big_i(16)]
-            res_account.should eq account
-          end
+          exec_test desc[name]
         end
       }
     end
