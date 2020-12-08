@@ -55,6 +55,7 @@ lib LibEVMOne
   end
 
   alias Address = UInt8[20]
+  alias Bytes32 = UInt8[32]
 
   struct Result
     status_code : StatusCode

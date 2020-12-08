@@ -125,10 +125,18 @@ class EVMOne(T) < VM
         # TODO StorageModifiedAgain
         LibEVMOne::StorageStatus::StorageModified
       },
+      get_balance: ->(ctx : LibEVMOne::HostContext*, addr : LibEVMOne::Address*) {
+        puts "prout"
+        StaticArray(UInt8, 32).new(0)
+      },
     )
 
     @msg = LibEVMOne::Message.new
     @msg.gas = gas
+    @msg.sender = from
+    @msg.destination = to
+    @msg.input_data = input.to_unsafe
+    @msg.input_size = input.size
   end
 
   def run
