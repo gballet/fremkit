@@ -71,6 +71,10 @@ struct TestDataAccount
     ret.storage = Hash(BigInt, BigInt).new
     ret
   end
+
+  def self.default_slot : UInt8[32]
+    StaticArray(UInt8, 32).new(0)
+  end
 end
 
 NullAddress = LibEVMOne::Address.new(0)
@@ -79,7 +83,7 @@ describe "evmone lib" do
   it "runs a simple program" do
     # 2x PUSH1
     code = "60016000".hexbytes
-    vm = EVMOne.new(NullAddress, NullAddress, code, 10000, Fremkit::Core::MapState(TestDataAccount).new)
+    vm = EVMOne.new(NullAddress, NullAddress, code, 10000, Bytes.empty, Fremkit::Core::MapState(TestDataAccount).new)
     result = vm.run
     result.status_code.should eq LibEVMOne::StatusCode::Success
     result.gas_left.should eq 9994
@@ -95,11 +99,101 @@ describe "evmone lib" do
     state = Fremkit::Core::MapState(TestDataAccount).new
     state[0.to_big_i] = TestDataAccount.default_account
     state[0.to_big_i].storage[0.to_big_i] = 2.to_big_i
-    vm = EVMOne.new(NullAddress, NullAddress, code, 25000, state)
+    vm = EVMOne.new(NullAddress, NullAddress, code, 25000, Bytes.empty, state)
     result = vm.run
     result.status_code.should eq LibEVMOne::StatusCode::Success
     result.gas_left.should eq 4944
   end
 
+  describe "Ethereum VM tests" do
+    describe "Arithmetic" do
+      dirname = "#{VMTestDir}/vmArithmeticTest"
+      dir = Dir.new(dirname)
+      dir.each { |filename|
+        next if filename !~ /.json$/
+        name = filename.gsub(/.json$/, "")
+        desc = JSON.parse(File.read("#{dirname}/#{filename}"))
+
+        it name do
+          state = Fremkit::Core::MapState(TestDataAccount).new
+          pre = Hash(String, TestDataAccount).from_json desc[name]["pre"].to_json
+          pre.each do |addr, account|
+            state[addr[2..].to_big_i(16)] = account
+          end
+
+          exec = desc[name]["exec"]
+          code = exec["code"].to_s[2..].hexbytes
+          gas = exec["gas"].to_s[2..].to_big_i(16).to_i64
+          msg = LibEVMOne::Message.new(
+            kind: LibEVMOne::CallKind::CALL,
+            gas: gas,
+            destination: LibEVMOne::Address.new(20),
+            sender: LibEVMOne::Address.new(20),
+          )
+          accaddr = exec["address"].to_s[2..].hexbytes
+          sendaddr = exec["caller"].to_s[2..].hexbytes
+          20.times do |i|
+            msg.destination[i] = accaddr[i]
+            msg.sender[i] = sendaddr[i]
+          end
+
+          input = exec["data"].to_s[2..].hexbytes
+
+          evm = EVMOne.new msg.sender, msg.destination, code, gas, input, state
+          result = evm.run
+
+          post = Hash(String, TestDataAccount).from_json (desc[name]["post"]? || Hash(Nil, Nil).new).to_json
+          post.each do |addr, account|
+            res_account = state[addr[2..].to_big_i(16)]
+            res_account.should eq account
+          end
+        end
+      }
+    end
+
+    describe "Bitwise logic" do
+      dirname = "#{VMTestDir}/vmBitwiseLogicOperation"
+      dir = Dir.new(dirname)
+      dir.each { |filename|
+        next if filename !~ /.json$/
+        name = filename.gsub(/.json$/, "")
+        desc = JSON.parse(File.read("#{dirname}/#{filename}"))
+
+        it name do
+          state = Fremkit::Core::MapState(TestDataAccount).new
+          pre = Hash(String, TestDataAccount).from_json desc[name]["pre"].to_json
+          pre.each do |addr, account|
+            state[addr[2..].to_big_i(16)] = account
+          end
+
+          exec = desc[name]["exec"]
+          code = exec["code"].to_s[2..].hexbytes
+          gas = exec["gas"].to_s[2..].to_big_i(16).to_i64
+          msg = LibEVMOne::Message.new(
+            kind: LibEVMOne::CallKind::CALL,
+            gas: gas,
+            destination: LibEVMOne::Address.new(20),
+            sender: LibEVMOne::Address.new(20),
+          )
+          accaddr = exec["address"].to_s[2..].hexbytes
+          sendaddr = exec["caller"].to_s[2..].hexbytes
+          20.times do |i|
+            msg.destination[i] = accaddr[i]
+            msg.sender[i] = sendaddr[i]
+          end
+
+          input = exec["data"].to_s[2..].hexbytes
+
+          evm = EVMOne.new msg.sender, msg.destination, code, gas, input, state
+          result = evm.run
+
+          post = Hash(String, TestDataAccount).from_json (desc[name]["post"]? || Hash(Nil, Nil).new).to_json
+          post.each do |addr, account|
+            res_account = state[addr[2..].to_big_i(16)]
+            res_account.should eq account
+          end
+        end
+      }
+    end
   end
 end

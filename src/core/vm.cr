@@ -62,7 +62,7 @@ abstract class VM
 end
 
 class EVMOne(T) < VM
-  def initialize(from : LibEVMOne::Address, to : LibEVMOne::Address, @code : Bytes, gas : Int64, @state : Fremkit::Core::State(BigInt, T))
+  def initialize(from : LibEVMOne::Address, to : LibEVMOne::Address, @code : Bytes, gas : Int64, input : Bytes, @state : Fremkit::Core::State(BigInt, T))
     @host_if = LibEVMOne::HostInterface.new(
       account_exist: ->(ctx : LibEVMOne::HostContext*, addr : LibEVMOne::Address*) {
         false
@@ -85,6 +85,7 @@ class EVMOne(T) < VM
         end
 
         raise "unknown account" unless the_state.has_address?(address)
+        return T.default_slot unless the_state[address].storage.has_key?(slot)
         v = the_state[address].storage[slot]
         StaticArray(UInt8, 32).new do |i|
           ((v >> (8*(31 - i))) & 255).to_u8
@@ -121,6 +122,7 @@ class EVMOne(T) < VM
           return LibEVMOne::StorageStatus::StorageDeleted
         end
         the_state[address].storage[slot] = val
+        # TODO StorageModifiedAgain
         LibEVMOne::StorageStatus::StorageModified
       },
     )
