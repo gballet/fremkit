@@ -62,10 +62,61 @@ abstract class VM
 end
 
 class EVMOne(T) < VM
-  def initialize(@code : Bytes, gas : Int64, @state : Fremkit::Core::State(BigInt, T))
+  def initialize(from : LibEVMOne::Address, to : LibEVMOne::Address, @code : Bytes, gas : Int64, @state : Fremkit::Core::State(BigInt, T))
     @host_if = LibEVMOne::HostInterface.new(
       account_exist: ->(ctx : LibEVMOne::HostContext*, addr : LibEVMOne::Address*) {
         false
+      },
+      get_storage: ->(ctx : LibEVMOne::HostContext*, addr : LibEVMOne::Address*, key : UInt8[32]*) {
+        the_state = Box(Fremkit::Core::State(BigInt, T)).unbox(ctx)
+
+        # XXX convert a bytes32 to BigInt until the
+        # a better primitive is available.
+        slot = 0.to_big_i
+        puts addr.value
+        32.times do |i|
+          slot <<= 8
+          slot += key.value[i]
+        end
+        address = 0.to_big_i
+        20.times do |i|
+          address <<= 8
+          address += addr.value[i]
+        end
+
+        v = the_state[address].storage[slot]
+        StaticArray(UInt8, 32).new do |i|
+          ((v >> (8*(31 - i))) & 255).to_u8
+        end
+      },
+      set_storage: ->(ctx : LibEVMOne::HostContext*, addr : LibEVMOne::Address*, key : UInt8[32]*, value : UInt8[32]*) {
+        the_state = Box(Fremkit::Core::State(BigInt, T)).unbox(ctx)
+        slot = BigInt.new(0)
+        val = BigInt.new(0)
+        32.times do |i|
+          slot <<= 8
+          slot += key.value[i]
+
+          val <<= 8
+          val += value.value[i]
+        end
+        address = BigInt.new(0)
+        20.times do |i|
+          address <<= 8
+          address += addr.value[i]
+        end
+
+        the_state[address] = T.default_account unless the_state.has_address?(address)
+
+        # Guards
+        unless the_state[address].storage.has_key?(slot)
+          return LibEVMOne::StorageStatus::StorageUnchanged if val == 0
+          the_state[address].storage[slot] = val
+          return LibEVMOne::StorageStatus::StorageAdded
+        end
+        return LibEVMOne::StorageStatus::StorageUnchanged if the_state[address].storage[slot] == val && val != 0
+        the_state[address].storage[slot] = val
+        LibEVMOne::StorageStatus::StorageModified
       },
     )
 

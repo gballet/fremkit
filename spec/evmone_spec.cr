@@ -63,13 +63,23 @@ struct TestDataAccount
       str[2..].to_big_i(16)
     end
   end
+
+  def self.default_account : TestDataAccount
+    ret = TestDataAccount.allocate
+    ret.balance = 0.to_big_i
+    ret.nonce = 0.to_big_i
+    ret.storage = Hash(BigInt, BigInt).new
+    ret
+  end
 end
+
+NullAddress = LibEVMOne::Address.new(0)
 
 describe "evmone lib" do
   it "runs a simple program" do
     # 2x PUSH1
     code = "60016000".hexbytes
-    vm = EVMOne.new(code, 10000, Fremkit::Core::MapState(TestDataAccount).new)
+    vm = EVMOne.new(NullAddress, NullAddress, code, 10000, Fremkit::Core::MapState(TestDataAccount).new)
     result = vm.run
     result.status_code.should eq LibEVMOne::StatusCode::Success
     result.gas_left.should eq 9994
@@ -79,12 +89,17 @@ describe "evmone lib" do
     # PUSH1 1
     # PUSH1 0
     # SLOAD
-    # ADD
-    # PUSH1 0
     # SSTORE
-    vm = EVMOne.new("600160005401600055".hexbytes, 10000, Fremkit::Core::MapState(TestDataAccount).new)
+    # STOP
+    code = "60016000545500".hexbytes
+    state = Fremkit::Core::MapState(TestDataAccount).new
+    state[0.to_big_i] = TestDataAccount.default_account
+    state[0.to_big_i].storage[0.to_big_i] = 2.to_big_i
+    vm = EVMOne.new(NullAddress, NullAddress, code, 25000, state)
     result = vm.run
     result.status_code.should eq LibEVMOne::StatusCode::Success
-    result.gas_left.should eq 4938
+    result.gas_left.should eq 4944
+  end
+
   end
 end
